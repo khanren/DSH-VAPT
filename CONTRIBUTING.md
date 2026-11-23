@@ -22,7 +22,7 @@ npm run test:privacy
 
 ## Trying it in a real host
 
-With a local DSH CLI installed, run `npm run check:install`. It packs the current checkout, starts DSH in a temporary profile and checks that the plugin registers only `vapt` by default. For the manual installation steps, see the [README](README.md#安装--install-from-source).
+With a local DSH CLI installed, run `npm run check:install`. It packs the current checkout, starts DSH in a temporary profile and checks that the plugin registers only `vapt` by default. For the manual installation steps, see the [README](README.md#install-from-source).
 
 ## Ground rules
 

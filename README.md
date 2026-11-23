@@ -1,24 +1,22 @@
 # dsh-vapt
 
-`dsh-vapt` 是 DeepSeek Harness（DSH）的本地渗透测试记录插件。每个授权项目独立保存范围、资产、发现和证据，同一份记录可以生成中英文 Markdown 报告和 JSON 交付件。
+**English** · [中文](README.zh.md)
 
 `dsh-vapt` keeps a local record of an authorized security assessment in DeepSeek Harness (DSH). Each engagement has its own scope, assets, findings, and evidence. The plugin renders Chinese and English Markdown reports and a JSON export from those records.
 
-## 报告示例 / Sample report
+## Sample report
 
-这份中文报告用虚构的「纸舟档案馆」资产清单生成。下面是一条发现从证据到修复建议的摘录。
+The sample Chinese report is generated from a fictional "Paper Boat Archive" asset inventory. Below is an excerpt of a finding from evidence to remediation:
 
-| 发现 / Finding | 证据摘录 / Evidence excerpt | 修复建议 / Remediation |
+| Finding | Evidence excerpt | Remediation |
 |---|---|---|
-| 资产清单缺少维护负责人（低风险） | `{"asset":"archive.example.invalid","owner":null}` | 填写负责团队和联系渠道，由值班人员验证能否联系到该团队。 |
+| Asset inventory is missing a maintenance owner (Low) | `{"asset":"archive.example.invalid","owner":null}` | Record the responsible team and contact channel, and have on-call staff verify that the team can be reached. |
 
-The fictional archive’s inventory has no owner for its catalogue service. The Chinese Markdown export links the finding to its evidence and includes a concrete fix. [查看完整报告 / Read the sample report](docs/example-report.zh.md)
+The fictional archive’s inventory has no owner for its catalogue service. The Chinese Markdown export links the finding to its evidence and includes a concrete fix. [Read the sample report (Chinese)](docs/example-report.zh.md)
 
-## 安装 / Install from source
+## Install from source
 
-使用 Node.js 22、npm 和本机 DSH CLI，在项目根目录执行以下命令。安装程序会按需从 web 模板创建 `pentest` 配置并注册插件。若 `dsh` 不在 PATH 中，请将 `DSH_BIN` 设为 CLI 的绝对路径。
-
-From the project root, use Node.js 22 and npm to pack the checkout and install it into the `pentest` profile. The installer creates the profile from DSH’s web template if needed. Set `DSH_BIN` to the CLI’s absolute path if `dsh` is unavailable on your PATH. The package declares Node.js 20 or later and lists DSH `0.2.2-rc.3` and `0.2.2-rc.5` as host targets.
+From the project root, use Node.js 22, npm, and your local DSH CLI to pack the checkout and install it into the `pentest` profile. The installer creates the profile from DSH’s web template if needed and registers the plugin. Set `DSH_BIN` to the CLI’s absolute path if `dsh` is unavailable on your PATH. The package declares Node.js 20 or later and lists DSH `0.2.2-rc.3` and `0.2.2-rc.5` as host targets.
 
 ```sh
 npm pack
@@ -26,25 +24,21 @@ node bin/dsh-vapt.mjs install --profile pentest --package "$PWD/dsh-vapt-1.0.0.t
 "${DSH_BIN:-dsh}" --profile pentest
 ```
 
-首次启动后，打开新会话的模式菜单。插件默认只添加 **VAPT mode**，建档、整理证据和导出报告都可在这里完成。在另一个终端，从项目根目录运行以下命令可检查注册状态。
-
-On first launch, open the mode picker in a new session. The plugin adds one entry by default, **VAPT mode**, which covers the engagement from record creation through reporting. To check registration, run the following from the project root in a second terminal.
+On first launch, open the mode picker in a new session. The plugin adds one entry by default, **VAPT mode**, which covers the engagement from record creation through evidence collection and reporting. To check registration, run the following from the project root in a second terminal:
 
 ```sh
 node bin/dsh-vapt.mjs doctor
 ```
 
-### 选配模式 / Optional modes
+### Optional modes
 
-| 配置 ID / Preset ID | 菜单名称 / Menu label |
+| Preset ID | Menu label |
 |---|---|
 | `vapt-recon` | VAPT recon mode |
 | `vapt-verify` | VAPT verify mode |
 | `vapt-report` | VAPT report mode |
 
-在 `pentest` profile 的 `cordis.patch.yml` 中，把需要的 ID 加入 `dsh-vapt` 的 `optionalPresets` 列表。文件默认位于 `~/.dsh/profiles/pentest/cordis.patch.yml`。下例只选配报告模式，重启该 profile 后，菜单会显示 **VAPT mode** 和 **VAPT report mode**。
-
-Edit `profiles/pentest/cordis.patch.yml` under `DSH_HOME` (default `~/.dsh`). Add the following entry to its YAML list, or update the existing `dsh-vapt` entry. Restart the profile to apply the change. This example enables the report mode alongside the default.
+Edit `profiles/pentest/cordis.patch.yml` under `DSH_HOME` (default `~/.dsh/profiles/pentest/cordis.patch.yml`). Add the required preset IDs to the `optionalPresets` list under the `dsh-vapt` entry, then restart the profile to apply the change. The example below enables the report mode alongside the default, so the menu shows **VAPT mode** and **VAPT report mode**:
 
 ```yaml
 - id: dsh-vapt
@@ -53,40 +47,32 @@ Edit `profiles/pentest/cordis.patch.yml` under `DSH_HOME` (default `~/.dsh`). Ad
     optionalPresets: [vapt-report]
 ```
 
-每个 ID 都可单独选用，也可组合。设为 `optionalPresets: []` 并重启即可恢复默认。List any combination of the three IDs. Set `optionalPresets: []` and restart to return to one VAPT entry.
+List any combination of the three IDs. Set `optionalPresets: []` and restart to return to a single **VAPT mode** entry.
 
-## 从记录到报告 / From records to reports
+## From records to reports
 
-| 操作 / Task | 工具 / Tool | 结果 / Result |
+| Task | Tool | Result |
 |---|---|---|
-| 建立项目 / Start a record | `vapt_engagement_open` | 创建项目并返回 ID，保存客户名、范围、排除项和测试窗口。Creates the engagement, saves its scope, exclusions, and test window, and returns its ID. |
-| 整理记录 / Record observations | `vapt_asset_add`, `vapt_finding_add`, `vapt_evidence_add` | 记录资产和发现，通过 finding ID 关联证据。Links evidence to a finding by ID and records a SHA-256 digest for the evidence. |
-| 核对发现 / Review findings | `vapt_status`, `vapt_findings_list` | 对照发现总数与可交付数量，查看每条记录的状态。Shows finding statuses and how many findings qualify for delivery. |
-| 导出报告 / Export reports | `vapt_report` | 在项目目录中生成 `report.zh.md`、`report.en.md` 和 `report.json`。Writes all three files in the engagement directory. |
+| Start a record | `vapt_engagement_open` | Creates the engagement, saves its client name, scope, exclusions, and test window, and returns its ID. |
+| Record observations | `vapt_asset_add`, `vapt_finding_add`, `vapt_evidence_add` | Records assets and findings, links evidence to a finding by ID, and records a SHA-256 digest for the evidence. |
+| Review findings | `vapt_status`, `vapt_findings_list` | Compares total findings against deliverable findings and shows the status of each record. |
+| Export reports | `vapt_report` | Writes `report.zh.md`, `report.en.md`, and `report.json` in the engagement directory. |
 
-在 **VAPT mode** 中使用 `vapt_engagement_open` 建档。对已有项目，先用 `vapt_status` 核对 ID，再用 `vapt_report` 导出。多个会话共用一个当前项目指针，同时处理不同项目时请显式传入 `engagement` ID。
+In **VAPT mode**, open a new engagement with `vapt_engagement_open`, or check an existing engagement’s ID with `vapt_status` and generate the files with `vapt_report`. Because multiple sessions share a current-engagement pointer, pass the `engagement` ID explicitly when sessions share a store and work on different assessments.
 
-In **VAPT mode**, open a new engagement or check an existing engagement’s ID with `vapt_status`, then generate the files with `vapt_report`. Pass the `engagement` ID explicitly when sessions share a store and work on different assessments.
+**Which findings appear in the report?** A finding qualifies when its `status` is `confirmed` or `exploited` and its `confidence` is other than `claimed`. Attached evidence is optional, though linked evidence should be reviewed before delivery. In `report.json` (schema `dsh-vapt/report@1`), `counts.findings` is the number included and `counts.withheld` is the number left out.
 
-**哪些发现会进入报告？ / Which findings appear?** 发现的 `status` 必须是 `confirmed` 或 `exploited`，且 `confidence` 不能是 `claimed`。证据附件是可选项，交付前应核对关联证据。
+**How do I verify an evidence digest?** Join the original `tool`, `command`, `request`, and `response` fields in that order with a single line feed (`LF`), and compute SHA-256 over the UTF-8 bytes. The store retains the first 20,000 UTF-16 code units of each request and response, while Markdown shows up to 2,000 code units of the response. Keep the full original inputs if you need to verify a truncated record.
 
-A finding qualifies when its status is `confirmed` or `exploited` and its confidence is other than `claimed`. A qualifying finding can have no attached evidence. In `report.json` (schema `dsh-vapt/report@1`), `counts.findings` is the number included and `counts.withheld` is the number left out.
+## Console and integrations
 
-**如何核对证据摘要？ / How do I verify an evidence digest?** 按顺序将原始 `tool`、`command`、`request`、`response` 用一个换行符（LF）连接，再对 UTF-8 字节计算 SHA-256。较长的请求和响应会被截短，核对时需要完整原文。
+- **DSH** · The plugin registers 17 DSH tools and adds **VAPT mode** to the mode picker by default. Click the `vapt` button next to the chat input (or open the local `/vapt/ui` page) to inspect engagements, review findings, and preview reports.
+- **MCP** · `dsh-vapt-mcp` exposes 14 local record and report tools over stdio for managing engagements, assets, findings, and evidence, as well as exporting reports. Set `VAPT_ENGAGEMENT` to select an existing record by ID.
+- **External tools** · The registry describes 145 external tools (binaries must be installed separately). Recording findings and generating reports only require the local store.
 
-The digest covers the four original fields in that order, joined with LF and encoded as UTF-8. The store retains the first 20,000 UTF-16 code units of each request and response. Markdown shows up to 2,000 of the response. Keep the original inputs if you need to verify a longer record.
+## Storage and privacy
 
-## 控制台与接口 / Console and integrations
-
-- **DSH** · 插件提供 17 个 DSH 工具。新 profile 的模式菜单默认只添加 **VAPT mode**。点击输入框旁的 `vapt` 按钮可查看项目和报告。DSH registers 17 plugin tools and adds one mode by default. Open the `vapt` panel or the local `/vapt/ui` page to review findings and preview a report.
-- **MCP** · `dsh-vapt-mcp` 通过标准输入输出提供 14 个本地记录和报告工具，可整理项目、资产、发现和证据，并导出报告。The stdio MCP server exposes 14 tools for working with local records and reports. Set `VAPT_ENGAGEMENT` to select an existing record by ID.
-- **外部工具 / External tools** · 注册表有 145 个条目，对应程序需另行安装。The registry describes 145 external tools. Recording findings and generating reports only require the local store.
-
-## 数据位置与隐私 / Storage and privacy
-
-DSH 优先使用插件配置中的 `root`，MCP 优先使用环境变量 `VAPT_ROOT`。缺省时，两者依次使用 `VAPT_HOME`、`$DSH_HOME/vapt` 或 `~/.dsh/vapt`。两个客户端都可以读写所选目录中的项目。
-
-The DSH plugin’s `root` setting and the MCP server’s `VAPT_ROOT` environment variable each override the shared `VAPT_HOME` setting. With no override, the store lives under `$DSH_HOME/vapt`, or `~/.dsh/vapt` if `DSH_HOME` is unset. Point both clients at the same directory to share records.
+The DSH plugin’s `root` setting and the MCP server’s `VAPT_ROOT` environment variable each take precedence for their respective client. When unset, both fall back to `VAPT_HOME`, `$DSH_HOME/vapt`, or `~/.dsh/vapt` (if `DSH_HOME` is unset). Point both clients at the same directory to read and write shared records.
 
 ```text
 <data-root>/
@@ -98,36 +84,103 @@ The DSH plugin’s `root` setting and the MCP server’s `VAPT_ROOT` environment
     report.zh.md       report.en.md       report.json
 ```
 
-`credentials.json` 在本地以明文保存。新建或重写的凭据和导出报告在 macOS/Linux 上使用文件权限 `0600`。控制台的证据预览只显示元数据和 SHA-256。本地 Markdown 导出会包含原始证据，分享前请检查其中的敏感信息。
+`credentials.json` stores credential secrets in plaintext locally. Newly created or rewritten credential files and report exports use file mode `0600` on POSIX systems (macOS/Linux). The console's evidence preview displays only metadata and SHA-256 digests. Disk exports omit the credential secret field, but can contain recorded commands and, in Markdown exports, raw requests and responses. Review exports for sensitive information before sharing them. [Security policy](SECURITY.md)
 
-The store keeps credential secrets in plaintext. New and rewritten credential files and report exports use mode `0600` on POSIX systems. The dashboard shows evidence metadata and SHA-256 digests. Disk exports omit the credential secret field, but can contain recorded commands and, in Markdown, raw requests and responses. Review exports before sharing them. [安全策略 / Security policy](SECURITY.md)
+## Local checks
 
-## 本地检查 / Local checks
+Run these checks from the project root without starting DSH or Docker. They use local fixtures, temporary stores, or package metadata.
 
-以下检查可在源码目录运行，无需启动 DSH 或 Docker。Run these checks from the project root. They use local fixtures, temporary stores, or package metadata.
-
-| 命令 / Command | 检查内容 / Coverage |
+| Command | Coverage |
 |---|---|
-| `npm run mcp:test` | 核对 14 个 MCP 工具，用虚构资产验证从建档到交付的流程 / 14-tool inventory, stdio handshake, findings, evidence digests, credential masking, project isolation and all three exports |
-| `npm run test:privacy` | 文件权限、目录边界、故障恢复、预览脱敏与报告格式 / private files, path boundaries, damaged tables, scope exclusions, dashboard redaction and Markdown rendering |
-| `npm run client:test` | 控制台按钮、刷新和报告预览 / dock registration, refresh, and report preview |
-| `npm run host:check` | DSH 客户端声明及入口 / client manifest and loader entry point |
-| `npm run stress` | 并发写入和故障恢复 / concurrent store writes, stale locks, and recovery |
-| `npm run bench:test` | 评分与结果一致性 / scoring arithmetic and repeatable summaries |
+| `npm run mcp:test` | Verifies the 14-tool MCP inventory, stdio handshake, findings, evidence digests, credential masking, project isolation, and all three exports using fictional assets. |
+| `npm run test:privacy` | Checks file permissions, path boundaries, corrupted table recovery, scope exclusions, dashboard redaction, and Markdown rendering. |
+| `npm run client:test` | Verifies the console dock button registration, refresh, and report preview. |
+| `npm run host:check` | Checks the DSH client manifest and loader entry point. |
+| `npm run stress` | Tests concurrent store writes, stale locks, and fault recovery. |
+| `npm run bench:test` | Verifies benchmark scoring arithmetic and repeatable summaries. |
 
-已安装 DSH CLI 时，可运行 `npm run check:install`。它会重新打包当前源码，在独立的临时 `DSH_HOME` 中创建 profile，并检查默认只注册 `VAPT mode`。With the local DSH CLI installed, this check packs the current source and verifies the default VAPT registration in a fresh profile.
+With the local DSH CLI installed, run `npm run check:install`. It repacks the current source, creates a profile in an isolated temporary `DSH_HOME`, and verifies that only `VAPT mode` is registered by default.
 
-完整测试入口为 `npm test`，另含功能测试及本地合成靶场基准。The full `npm test` suite also runs functional checks and a benchmark against a local fixture. [脚本定义 / Package scripts](package.json)
+The full test entry point is `npm test`, which also runs functional checks and a benchmark against a local synthetic target fixture. [Package scripts](package.json)
 
-## 基准结果 / Benchmark results
+## Benchmark vs. market plugins & agents
 
-仓库保存了固定目录 **v1.6.2** 的评分结果。项目自带的确定性探针在 OWASP Juice Shop 中命中 20/20 项，在 DVWA 中命中 10/10 项。下表为归档结果，衡量范围仅限该目录与对应环境。
+We evaluated 12 public DSH plugins and AI pentest tools against the same frozen vulnerability catalogue (**v1.6.2**: 20 items + 2 negative controls on OWASP Juice Shop; 10 items on authenticated DVWA) under identical scoring rules. Four tools produced scorable vulnerability findings on the live targets (`dsh-redteam-mode` and `strix` were both driven by `deepseek/deepseek-chat`).
 
-The recorded scores measure the project’s deterministic probes against a predefined catalogue. The run counts matter when interpreting repeatability, particularly for DVWA. [评分结果 / Recorded results](bench/paper-results.json) · [评测方法 / Methodology](bench/METHODOLOGY.md)
+### 1. Detection, speed, and cost (best adjudicated run)
 
-| 靶场 / Target | 目录命中 / Catalogue hits | 误报 / False positives | 轮数 / Runs |
-|---|---:|---:|---:|
-| OWASP Juice Shop | 20 / 20 | 0 | 3 |
-| DVWA | 10 / 10 | 0 | 1 |
+```mermaid
+xychart-beta
+    title "Combined 30-Item Catalogue Hits (Juice Shop 20 + DVWA 10)"
+    x-axis ["dsh-vapt (12.1s, 0 tok)", "dsh-redteam-mode (~13m)", "strix (~39m, 41.7M tok)", "HexStrike (~3m)"]
+    y-axis "Vulnerabilities Detected (out of 30)" 0 --> 30
+    bar [30, 27, 21, 1]
+```
 
-[架构 / Architecture](docs/ARCHITECTURE.md) · [变更记录 / Changelog](CHANGELOG.md) · [Apache-2.0 license](LICENSE)
+| Target | Tool | Visual recall | Recall | F1 | Hits | FP | Time | Cost |
+|---|---|---|---:|---:|---:|---:|---:|---|
+| **OWASP Juice Shop** (20) | **dsh-vapt** (deterministic probes) | `████████████████████` | **100.0%** | **100.0%** | **20 / 20** | 0 | **3.4 s** | **0 tokens** |
+| OWASP Juice Shop (20) | dsh-redteam-mode `0.15.1` | `█████████████████░░░` | 85.0% | 91.9% | 17 / 20 | 0 | ~5 min | DeepSeek API |
+| OWASP Juice Shop (20) | strix `1.7.0` | `████████████░░░░░░░░` | 60.0% | 75.0% | 12 / 20 | 0 | ~35 min | 23.78M tokens (~$2.00) |
+| OWASP Juice Shop (20) | HexStrike AI `v6` (nuclei backend) | `█░░░░░░░░░░░░░░░░░░░` | 5.0% | 9.5% | 1 / 20 | 0 | ~2 min | 0 tokens |
+| **DVWA** (10) | **dsh-vapt** (deterministic probes) | `████████████████████` | **100.0%** | **100.0%** | **10 / 10** | 0 | **8.7 s** | **0 tokens** |
+| DVWA (10) | dsh-redteam-mode `0.15.1` | `████████████████████` | 100.0% | 100.0% | 10 / 10 | 0 | ~8 min | DeepSeek API |
+| DVWA (10) | strix `1.7.0` | `██████████████████░░` | 90.0% | 94.7% | 9 / 10 | 0 | 4.4 min | 17.96M tokens (~$1.50) |
+| DVWA (10) | HexStrike AI `v6` (nuclei backend) | `░░░░░░░░░░░░░░░░░░░░` | 0.0% | 0.0% | 0 / 10 | 0 | ~1 min | 0 tokens |
+
+### 2. Run-to-run repeatability (same model, prompt, and target)
+
+LLM agents exhibit significant run-to-run variance on the exact same target and prompt—and often miss configuration or exposure issues (`/metrics`, `/support/logs`, `/ftp` directory listing, missing security headers, exposed `setup.php`)—whereas `dsh-vapt`'s deterministic probes achieve zero variance (`σ = 0`):
+
+```mermaid
+xychart-beta
+    title "Run-to-Run Recall Stability on DVWA (% across repeated runs)"
+    x-axis ["Run 1", "Run 2", "Run 3", "Run 4", "Run 5", "Run 6"]
+    y-axis "Recall (%)" 0 --> 100
+    line [100, 100, 100, 100, 100, 100]
+    line [50, 90, 90, 90, 30, 90]
+```
+> **Top line (`100%` flat):** `dsh-vapt` (`σ = 0.0`) · **Bottom line (`30%–90%` swing):** `strix` (`σ = 22.4`)
+
+| Target | Tool | Per-round recall (%) | Mean | Std dev (`σ`) | Runs (`n`) |
+|---|---|---|---:|---:|---:|
+| **DVWA** (10) | **dsh-vapt** | `100 / 100 / 100` | **100.0%** | **0.0** | 3 |
+| DVWA (10) | dsh-redteam-mode | `100 / 90` (+1 timeout at 420 s) | 95.0% | 5.0 | 2 |
+| DVWA (10) | strix | `50 / 90 / 90 / 90 / 30 / 90` | 73.3% | 22.4 | 6 |
+| **OWASP Juice Shop** (20) | **dsh-vapt** | `100 / 100 / 100` | **100.0%** | **0.0** | 3 |
+| OWASP Juice Shop (20) | dsh-redteam-mode | `85 / 85 / 80` | 83.3% | 2.4 | 3 |
+| OWASP Juice Shop (20) | strix | `50 / 50 / 40` | 46.7% | 4.7 | 3 |
+
+### 3. Ecosystem comparison (12 tools evaluated)
+
+```mermaid
+flowchart TD
+    Pool["12 Public DSH Plugins & AI Pentest Tools Evaluated"]
+    Pool --> NonScan["3 Non-Scanner DSH Plugins (dsh-atn, dsh-team-rooms, dsh-soul)"]
+    Pool --> BootFail["5 Failed or Heavy Platform Setup (deadend-cli, Nebula, RedAmon, PentAGI, cleverer-dsh)"]
+    Pool --> Scored["4 Tools Scored on Live Targets (OWASP Juice Shop + DVWA = 30 Items)"]
+
+    Scored --> VAPT["dsh-vapt 1.0.0: 30/30 Hits (100%) | σ = 0 | 12.1s | 0 tokens"]
+    Scored --> Redteam["dsh-redteam-mode 0.15.1: 27/30 Hits (90%) | σ = 2.4–5.0 | ~13 min"]
+    Scored --> Strix["strix 1.7.0: 21/30 Hits (70%) | σ = 4.7–22.4 | ~39 min | 41.7M tokens"]
+    Scored --> Hex["HexStrike AI v6: 1/30 Hits (3.3%) | No scope guardrails | No report store"]
+```
+
+| Tool | Type | Install & boot | Guardrails (scope / budget / allowlist) | Evidence & reporting | Benchmark status |
+|---|---|---|---|---|---|
+| **dsh-vapt `1.0.0`** | DSH plugin + MCP | ✅ Clean (1 default + 3 role presets) | ✅ Hard scope check, arg allowlist, spray lockout stop, role tool filtering | ✅ JSON store + SHA-256 digests + zh/en Markdown & Mermaid + `report.json` | **30 / 30** across both targets (`σ = 0`) |
+| **dsh-redteam-mode `0.15.1`** | DSH plugin | ✅ Clean | Not enforced at tool layer | SQLite store + report | **27 / 30** best run (5–8 min/run) |
+| **strix `1.7.0`** | CLI agent | ⚠️ Needs Python ≥3.12 & Docker sandbox | `--max-budget` / `--max-turns` | Run directory + report | **21 / 30** best run (41.7M tokens total) |
+| **HexStrike AI `v6`** | HTTP/MCP backend | ⚠️ Broken `requirements.txt` (`unicorn`) | ❌ None (unauthenticated `/api/command` runs out-of-scope shell) | ❌ No findings store or reports | **1 / 30** via nuclei endpoint |
+| **dsh-atn `0.7.0`** | DSH plugin | ✅ Clean | — | Topology visualizer (not a scanner) | Not a vulnerability detector |
+| **dsh-team-rooms `1.0.9`** | DSH plugin | ✅ Clean | — | Cross-session collaboration rooms | Not a vulnerability detector |
+| **dsh-soul `0.14.0`** | DSH plugin | ✅ Clean | — | Correction / memory plugin | Not a vulnerability detector |
+| **deadend-cli `0.1.15`** | CLI agent | ❌ Crashes on start (`ImportError`) | — | — | Failed to boot |
+| **Nebula `2.0.0`** | CLI workbench | ⚠️ `--help` hangs >60 s | — | — | Timed out on init |
+| **RedAmon / PentAGI / cleverer-dsh** | Platforms / unlisted | ⚠️ Multi-hour image build, 12-service EULA, or not on npm | — | — | `not-run` (see details) |
+
+> **Scope note:** Deterministic probes guarantee fast, zero-token, 100% repeatable baseline coverage on known catalogue classes, while LLM agents remain useful for open-ended, multi-step business logic exploration outside a predefined catalogue.
+
+[Full paper benchmark & item-by-item matrix](bench/PAPER.md) · [Competitor evaluation notes](bench/COMPETITORS.md) · [Recorded results JSON](bench/paper-results.json) · [Methodology](bench/METHODOLOGY.md)
+
+[Architecture](docs/ARCHITECTURE.md) · [Changelog](CHANGELOG.md) · [Apache-2.0 license](LICENSE)

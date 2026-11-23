@@ -31,4 +31,4 @@ The stdio MCP server exposes 14 local record and report tools. A connected clien
 
 DSH uses the plugin’s `root` setting and MCP uses `VAPT_ROOT` as its explicit store location. Each falls back to `VAPT_HOME`, then `$DSH_HOME/vapt` or `~/.dsh/vapt`. Keep that directory on a private volume. It may contain client identifiers, HTTP evidence, plaintext credentials and report exports.
 
-The dashboard’s evidence view shows metadata and digests. Before sharing a report, review its findings, recorded commands and evidence for sensitive values. [Storage and privacy](README.md#数据位置与隐私--storage-and-privacy)
+The dashboard’s evidence view shows metadata and digests. Before sharing a report, review its findings, recorded commands and evidence for sensitive values. [Storage and privacy](README.md#storage-and-privacy)
