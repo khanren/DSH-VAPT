@@ -1,0 +1,17 @@
+# dsh-vapt — host 行：装数据层 + 安装 VAPT 预设 + 写诊断标记。工具在预设平面（dsh-vapt/tools）。
+# 不 patch 宿主任何条目：不改 approval、不改 sandbox、不动 systemPrompt 的宿主措辞。
+# 这样 DSH 升级时不会「补丁全碎」，最差情况只是工具没注册上，数据仍然在盘上。
+- insert:
+    - id: dsh-vapt
+      name: 'dsh-vapt'
+      config:
+        # 数据根目录；留空 = $DSH_HOME/vapt
+        root: ''
+        # 工具描述语言：zh | en
+        lang: zh
+        # 按 profile 选配：vapt-recon、vapt-verify、vapt-report
+        optionalPresets: []
+
+    # 控制台（只读）：/vapt/api + /vapt/ui，浏览器直接开
+    - id: dsh-vapt-ui
+      name: dsh-vapt/ui

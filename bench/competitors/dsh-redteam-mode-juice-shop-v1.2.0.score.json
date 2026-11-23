@@ -1,0 +1,84 @@
+{
+  "schema": "dsh-vapt/score@1",
+  "tool": "dsh-redteam-mode",
+  "app": "juice-shop",
+  "groundTruth": {
+    "version": "1.2.0",
+    "scored": 11
+  },
+  "counts": {
+    "tp": 8,
+    "fn": 3,
+    "fp": 0,
+    "extraTp": 7
+  },
+  "metrics": {
+    "recall": 0.7272727272727273,
+    "recallCi95": [
+      0.4343497069897537,
+      0.9025411942607853
+    ],
+    "precision": 1,
+    "evidenceCoverage": null,
+    "reproducibility": null,
+    "composite": null,
+    "note": "composite 不计算：证据哈希/可复现性未测"
+  },
+  "perItem": [
+    {
+      "id": "JS-01",
+      "status": "TP",
+      "title": "SQL injection in /rest/products/search (q=')) )"
+    },
+    {
+      "id": "JS-02",
+      "status": "TP",
+      "title": "Admin configuration readable without authentication"
+    },
+    {
+      "id": "JS-03",
+      "status": "FN",
+      "title": "/rest/memories leaks user photos and emails"
+    },
+    {
+      "id": "JS-04",
+      "status": "TP",
+      "title": "Directory listing on /ftp"
+    },
+    {
+      "id": "JS-05",
+      "status": "TP",
+      "title": "Missing CSP and HSTS headers"
+    },
+    {
+      "id": "JS-06",
+      "status": "TP",
+      "title": "Authentication bypass via SQL injection on /rest/user/login"
+    },
+    {
+      "id": "JS-07",
+      "status": "FN",
+      "title": "Unauthenticated product modification via PUT /api/Products/{id}"
+    },
+    {
+      "id": "JS-08",
+      "status": "FN",
+      "title": "Mass assignment: self-registration with role=admin"
+    },
+    {
+      "id": "JS-09",
+      "status": "TP",
+      "title": "JWT alg=none accepted by /api/Users"
+    },
+    {
+      "id": "JS-10",
+      "status": "TP",
+      "title": "Null-byte extension bypass on /ftp exposes package.json.bak"
+    },
+    {
+      "id": "JS-11",
+      "status": "TP",
+      "title": "Any customer token can enumerate all users via /api/Users"
+    }
+  ]
+}

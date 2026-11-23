@@ -1,0 +1,111 @@
+{
+  "name": "dsh-vapt",
+  "version": "1.0.0",
+  "description": "Local security assessment records for DeepSeek Harness with SHA-256 evidence digests, bilingual reports, one default mode, three optional presets and a 14-tool MCP server.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./tools": "./src/tools-entry.js",
+    "./store": "./src/pentest/store.js",
+    "./package.json": "./package.json",
+    "./ui": "./src/pentest/ui.js",
+    "./client": "./client.js"
+  },
+  "files": [
+    "src",
+    "presets",
+    "docs",
+    "mcp",
+    "bench",
+    "scripts/verify.mjs",
+    "scripts/stress.mjs",
+    "scripts/e2e.mjs",
+    "scripts/gen-registry.mjs",
+    "scripts/gen-preset-definition.py",
+    "README.md",
+    "CHANGELOG.md",
+    "SECURITY.md",
+    "PUBLISHING.md",
+    "LICENSE",
+    "NOTICE",
+    "cordis.patch.yml",
+    "client.js",
+    "bench/demo.mjs",
+    "scripts/mcp-smoke.mjs",
+    "scripts/client-smoke.mjs",
+    "scripts/host-compat.mjs",
+    "scripts/clean-install-check.sh",
+    "scripts/bench-tests.mjs",
+    "scripts/*.test.mjs",
+    "scripts/store-safety.mjs",
+    "bin/dsh-vapt.mjs",
+    "data"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  },
+  "dshTargets": [
+    "0.2.2-rc.5",
+    "0.2.2-rc.3"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "cordis-plugin",
+    "vapt",
+    "pentest",
+    "security",
+    "ai-pentest",
+    "security-testing",
+    "engagement-management",
+    "benchmark",
+    "mcp",
+    "agent"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khanren/dsh-vapt.git"
+  },
+  "bugs": {
+    "url": "https://github.com/khanren/dsh-vapt/issues"
+  },
+  "homepage": "https://github.com/khanren/dsh-vapt#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "verify": "node scripts/verify.mjs",
+    "stress": "node scripts/stress.mjs",
+    "e2e": "node scripts/e2e.mjs",
+    "bench": "node bench/run.mjs",
+    "test": "npm run test:privacy && node scripts/verify.mjs && node scripts/stress.mjs && node scripts/mcp-smoke.mjs && node scripts/client-smoke.mjs && node scripts/host-compat.mjs && node scripts/bench-tests.mjs && node bench/run.mjs",
+    "test:privacy": "node --test scripts/cli-privacy.test.mjs scripts/report-privacy.test.mjs scripts/scope-deny.test.mjs scripts/store-safety.mjs",
+    "mcp": "node mcp/server.mjs",
+    "bench:real": "node bench/real.mjs --juice --runs 2",
+    "bench:score": "node bench/score.mjs",
+    "bench:compare": "node bench/compare.mjs",
+    "demo": "node bench/demo.mjs",
+    "mcp:test": "node scripts/mcp-smoke.mjs",
+    "client:test": "node scripts/client-smoke.mjs",
+    "host:check": "node scripts/host-compat.mjs",
+    "check:install": "bash scripts/clean-install-check.sh",
+    "bench:test": "node scripts/bench-tests.mjs"
+  },
+  "author": "khanren",
+  "bin": {
+    "dsh-vapt": "./bin/dsh-vapt.mjs",
+    "dsh-vapt-mcp": "./mcp/server.mjs"
+  }
+}

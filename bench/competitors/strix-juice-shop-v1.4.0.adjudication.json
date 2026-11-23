@@ -1,0 +1,73 @@
+{
+  "schema": "dsh-vapt/adjudication@1",
+  "tool": "strix",
+  "app": "juice-shop",
+  "groundTruth": "1.6.2",
+  "source": "/tmp/strix_runs/host-docker-internal-3000_d80d/findings.sarif (308 requests, 23.78M tokens, $2 budget)",
+  "note": "Juice Shop 3 轮：机械判定 50 / 50 / 40（mean 46.7%，σ 4.7）；表中为人工裁决的 r1 结果（60%）。",
+  "items": [
+    {
+      "match": "Mass Assignment ... POST /api/Users",
+      "verdict": "catalogue",
+      "itemId": "JS-08"
+    },
+    {
+      "match": "UNION-based SQL Injection in /rest/products/search",
+      "verdict": "catalogue",
+      "itemId": "JS-01"
+    },
+    {
+      "match": "SQL injection authentication bypass in POST /rest/user/login",
+      "verdict": "catalogue",
+      "itemId": "JS-06"
+    },
+    {
+      "match": "Null-Byte Extension Filter Bypass on /ftp",
+      "verdict": "catalogue",
+      "itemId": "JS-10"
+    },
+    {
+      "match": "Unauthenticated product catalogue modification",
+      "verdict": "catalogue",
+      "itemId": "JS-07"
+    },
+    {
+      "match": "Any customer token can list every user account",
+      "verdict": "catalogue",
+      "itemId": "JS-11"
+    },
+    {
+      "match": "JWT `alg:none` accepted",
+      "verdict": "catalogue",
+      "itemId": "JS-09"
+    },
+    {
+      "match": "Broken object-level authorization ... baskets",
+      "verdict": "catalogue",
+      "itemId": "JS-16"
+    },
+    {
+      "match": "Customer accounts can create and modify products",
+      "verdict": "catalogue",
+      "itemId": "JS-17"
+    },
+    {
+      "match": "security-question password reset",
+      "verdict": "catalogue",
+      "itemId": "JS-19"
+    },
+    {
+      "match": "Negative basket quantity",
+      "verdict": "catalogue",
+      "itemId": "JS-20"
+    },
+    {
+      "match": "Deluxe membership granted at no cost",
+      "verdict": "catalogue",
+      "itemId": "JS-18"
+    }
+  ],
+  "time": "~35 min",
+  "cost": "2378 万 token · $2.00",
+  "runs": 3
+}

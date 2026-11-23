@@ -1,0 +1,17 @@
+{
+  "schema": "dsh-vapt/adjudication@1",
+  "tool": "HexStrike AI (nuclei backend)",
+  "app": "juice-shop",
+  "groundTruth": "1.6.0",
+  "source": "POST /api/tools/nuclei target=http://127.0.0.1:3000 severity=all additional_args=-jsonl -silent（HexStrike :8888 实测）",
+  "time": "~2 min",
+  "cost": "0 token（无 agent 层，直接调 nuclei）",
+  "items": [
+    {
+      "match": "prometheus-metrics → /metrics",
+      "verdict": "catalogue",
+      "itemId": "JS-12"
+    }
+  ],
+  "runs": 1
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "dsh-vapt/adjudication@1",
+  "tool": "HexStrike AI (nuclei backend)",
+  "app": "dvwa",
+  "groundTruth": "1.6.0",
+  "source": "POST /api/tools/nuclei target=http://127.0.0.1:4281（带 DVWA 会话 Cookie），返回 0 条",
+  "time": "~1 min",
+  "cost": "0 token",
+  "items": [],
+  "runs": 1
+}

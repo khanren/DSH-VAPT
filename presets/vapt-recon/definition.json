@@ -1,0 +1,244 @@
+{
+  "id": "vapt-recon",
+  "name": "VAPT recon mode",
+  "description": "侦察角色 / Recon role — 只收集资产与指纹，不写结论；发现交给 verify。 Assets and fingerprints only; no conclusions, hand off to verify.",
+  "order": 30,
+  "plugins": [
+    {
+      "id": "persona",
+      "name": "@deepseek-ai/dsh-persona",
+      "config": {
+        "prefix": "你是 VAPT 团队的**侦察手（recon）**。你只负责把攻击面摸清楚，不负责下结论。\n\n      ## 你做什么\n      1. `vapt_brief` 看范围与预算；`vapt_scope_check` 预检目标。\n      2. `vapt_tool_list` 看可用工具，用 `vapt_tool_run` 跑侦察类（subfinder / dnsx / naabu / nmap / httpx / katana / gau / arjun…）。\n      3. 结果用 `vapt_asset_add` 记资产（host + ports）。\n      4. 把可疑点写成**一句话线索**回报给指挥端，不要写成 finding。\n\n      ## 你不做什么\n      - 不调 `vapt_finding_add`（那是 verify 的职责）；不下「已确认漏洞」的结论。\n      - 不做爆破、不做利用、不改任何配置。\n      - 超出范围的 target 会被工具层拒绝，**不要重试**，改去 `vapt_scope_check` 确认。\n\n      ## 语言 / Language\n      跟随使用者语言（默认繁中）；命令、路径、错误信息保持原文。\n\n      You are the **recon** role: map the attack surface, record assets, hand clues to the\n      commander. Never record findings, never exploit, never brute force.\n"
+      }
+    },
+    {
+      "id": "vapt-tools",
+      "name": "dsh-vapt/tools",
+      "config": {
+        "only": [
+          "vapt_brief",
+          "vapt_scope_check",
+          "vapt_status",
+          "vapt_asset_add",
+          "vapt_tool_list",
+          "vapt_tool_run",
+          "vapt_findings_list",
+          "vapt_slot"
+        ]
+      }
+    },
+    {
+      "id": "agent-instructions",
+      "name": "@deepseek-ai/dsh-agent-instructions",
+      "config": {
+        "maxBytes": 65536
+      }
+    },
+    {
+      "id": "tool-bash",
+      "name": "@deepseek-ai/dsh-tool-bash",
+      "disabled": {
+        "__jsExpr": "process.platform === 'win32'"
+      }
+    },
+    {
+      "id": "tool-pwsh",
+      "name": "@deepseek-ai/dsh-tool-pwsh",
+      "disabled": {
+        "__jsExpr": "process.platform !== 'win32'"
+      }
+    },
+    {
+      "id": "tool-fs",
+      "name": "@deepseek-ai/dsh-tool-fs"
+    },
+    {
+      "id": "tool-fs-search",
+      "name": "@deepseek-ai/dsh-tool-fs-search",
+      "config": {
+        "sampleOverCapGlobResults": false
+      }
+    },
+    {
+      "id": "tool-jobs",
+      "name": "@deepseek-ai/dsh-tool-jobs"
+    },
+    {
+      "id": "skill-filesystem",
+      "name": "@deepseek-ai/dsh-skill-filesystem",
+      "config": {
+        "includeDefaultRoots": false,
+        "customSkillDirs": [
+          {
+            "__jsExpr": "dshHomePath('skills')"
+          },
+          {
+            "__jsExpr": "dshHomePath('vapt/skills')"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tool-skill",
+      "name": "@deepseek-ai/dsh-tool-skill"
+    },
+    {
+      "id": "command-goal",
+      "name": "@deepseek-ai/dsh-command-goal"
+    },
+    {
+      "id": "tool-goal",
+      "name": "@deepseek-ai/dsh-tool-goal"
+    },
+    {
+      "id": "planning",
+      "name": "cordis:group",
+      "group": true,
+      "isolate": {
+        "planMode": true
+      },
+      "config": [
+        {
+          "id": "plan-mode",
+          "name": "@deepseek-ai/dsh-plan-mode",
+          "config": {
+            "section": "You are in plan mode. Stay in plan mode until exit_plan_mode succeeds or the user switches the session mode. Imperative language to implement changes means plan the implementation, not execute it. A user's conversational agreement — including an answer confirming something you asked — approves nothing and does not end plan mode; fold the confirmed decision into the plan and submit it through exit_plan_mode.\n\nExplore first. Use non-mutating reads, searches, static analysis, and checks to ground the plan in the actual repository. Do not edit or write files, change configuration, run formatters or code generation that rewrites tracked files, commit, or otherwise carry out the plan. Prefer existing functions and patterns over new machinery.\n\nThe tool catalog stays the same across modes for request-cache stability. These plan-mode rules override any later tool description or guidance that suggests using mutation tools; those tools remain listed to keep the tool catalog unchanged. Do not use todo_write to track this planning phase: it tracks implementation after an approved plan, while the plan itself belongs in exit_plan_mode.\n\nResolve discoverable facts by inspection. Use ask_user_question only for user-owned choices or material ambiguity that inspection cannot answer. Do not ask the user where code lives or how current behavior works when you can find out.\n\nMake the plan decision-complete: state the goal and success criteria; group implementation changes by subsystem; identify public API, schema, and data-flow changes; cover edge cases, failure modes, tests, acceptance criteria, and explicit assumptions. Keep it concise enough to review but detailed enough that another engineer can implement it without making design decisions.\n\nWhen ready, call exit_plan_mode with the complete plan markdown, starting with a # title. Make exit_plan_mode the only and final tool call in that assistant response: it presents the plan for approval, and implementation begins only in a later step after approval. Do not paste the final plan as a plain reply or ask \"should I proceed?\" through prose or ask_user_question. If review rejects it, incorporate the feedback and present again. If the review channel is unavailable or aborted, stay in plan mode and ask the user to switch modes manually; do not proceed with implementation.\n"
+          }
+        }
+      ]
+    },
+    {
+      "id": "compaction",
+      "name": "cordis:group",
+      "group": true,
+      "isolate": {
+        "compaction": true,
+        "toolResultPruner": true
+      },
+      "config": [
+        {
+          "id": "compaction-basic",
+          "name": "@deepseek-ai/dsh-compaction-basic"
+        },
+        {
+          "id": "command-compact",
+          "name": "@deepseek-ai/dsh-command-compact"
+        },
+        {
+          "id": "tool-result-pruner",
+          "name": "@deepseek-ai/dsh-compaction-tool-result-pruner",
+          "config": {
+            "thresholdChars": 8192,
+            "headChars": 4096,
+            "tailChars": 1024
+          }
+        }
+      ]
+    },
+    {
+      "id": "delegation",
+      "name": "cordis:group",
+      "group": true,
+      "isolate": {
+        "workflowEngine": true
+      },
+      "config": [
+        {
+          "id": "tool-subagent-control",
+          "name": "@deepseek-ai/dsh-tool-subagent-control",
+          "disabled": false
+        },
+        {
+          "id": "tool-subagent",
+          "name": "@deepseek-ai/dsh-tool-subagent",
+          "disabled": false,
+          "config": {
+            "provider": "spawn",
+            "toolName": "subagent",
+            "modelSelectionSettings": true,
+            "backgroundMode": "continuable",
+            "maxDepth": 1
+          }
+        },
+        {
+          "id": "tool-subagent-fork",
+          "name": "@deepseek-ai/dsh-tool-subagent",
+          "disabled": false,
+          "config": {
+            "provider": "fork",
+            "toolName": "subagent_fork",
+            "backgroundMode": "continuable"
+          }
+        },
+        {
+          "id": "tool-subagent-codex",
+          "name": "@deepseek-ai/dsh-tool-subagent",
+          "disabled": true,
+          "config": {
+            "provider": "codex",
+            "toolName": "subagent_codex",
+            "backgroundMode": "one-shot",
+            "maxDepth": "provider-managed"
+          }
+        },
+        {
+          "id": "tool-subagent-claude-code",
+          "name": "@deepseek-ai/dsh-tool-subagent",
+          "disabled": true,
+          "config": {
+            "provider": "claude-code",
+            "toolName": "subagent_claude_code",
+            "backgroundMode": "one-shot",
+            "maxDepth": "provider-managed"
+          }
+        },
+        {
+          "id": "workflow-worker-thread",
+          "name": "@deepseek-ai/dsh-workflow-worker-thread",
+          "disabled": true,
+          "config": {
+            "provider": "spawn"
+          }
+        },
+        {
+          "id": "workflow-ptc",
+          "name": "@deepseek-ai/dsh-workflow-ptc",
+          "config": {
+            "provider": "spawn"
+          }
+        },
+        {
+          "id": "tool-workflow",
+          "name": "@deepseek-ai/dsh-tool-workflow"
+        },
+        {
+          "id": "tool-ralph",
+          "name": "@deepseek-ai/dsh-tool-ralph",
+          "config": {
+            "subagentProvider": "spawn",
+            "maxRounds": 64
+          }
+        }
+      ]
+    },
+    {
+      "id": "tool-ask-user",
+      "name": "@deepseek-ai/dsh-tool-ask-user"
+    },
+    {
+      "id": "tool-todo",
+      "name": "@deepseek-ai/dsh-tool-todo",
+      "config": {
+        "allowParallelInProgress": true
+      }
+    },
+    {
+      "id": "tool-web",
+      "name": "@deepseek-ai/dsh-tool-web",
+      "config": {
+        "fetch": true,
+        "searchTimeoutMs": 60000
+      }
+    }
+  ]
+}

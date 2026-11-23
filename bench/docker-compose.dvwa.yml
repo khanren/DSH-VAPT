@@ -1,0 +1,28 @@
+# DVWA 需要独立的 MySQL sidecar；官方镜像不自带数据库进程。
+#   docker compose -f bench/docker-compose.dvwa.yml up -d
+#   open http://127.0.0.1:4281/setup.php  → Create / Reset Database
+#   然后：node bench/real.mjs --dvwa
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: p@ssw0rd
+      MYSQL_DATABASE: dvwa
+      MYSQL_USER: app
+      MYSQL_PASSWORD: vulnerables
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-pp@ssw0rd"]
+      interval: 5s
+      retries: 20
+  dvwa:
+    image: ghcr.io/digininja/dvwa
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_SERVER: db
+      DB_DATABASE: dvwa
+      DB_USER: app
+      DB_PASSWORD: vulnerables
+    ports:
+      - "127.0.0.1:4281:80"

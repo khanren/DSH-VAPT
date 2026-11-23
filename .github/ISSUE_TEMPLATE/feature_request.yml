@@ -1,0 +1,16 @@
+name: Feature request
+description: A tool adapter, report section, or workflow you want supported
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes: { label: What problem does this solve }
+    validations: { required: true }
+  - type: textarea
+    id: proposal
+    attributes: { label: Proposed behaviour }
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [tool adapter, report, spray/credentials, preset/mode, docs, other]

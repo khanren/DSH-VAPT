@@ -1,0 +1,78 @@
+{
+  "schema": "dsh-vapt/adjudication@1",
+  "tool": "strix",
+  "app": "dvwa",
+  "groundTruth": "1.6.0",
+  "source": "CLI 实测（deepseek/deepseek-chat，25 turns / $1.50 上限，264 请求 / 1796 万 token / 4.4 分钟）",
+  "time": "4.4 min",
+  "cost": "1796 万 token · $1.50",
+  "items": [
+    {
+      "match": "UNION-based SQL Injection /vulnerabilities/sqli",
+      "verdict": "catalogue",
+      "itemId": "DV-01"
+    },
+    {
+      "match": "Reflected XSS /vulnerabilities/xss_r",
+      "verdict": "catalogue",
+      "itemId": "DV-02"
+    },
+    {
+      "match": "OS Command Injection /vulnerabilities/exec",
+      "verdict": "catalogue",
+      "itemId": "DV-03"
+    },
+    {
+      "match": "Local File Inclusion /vulnerabilities/fi",
+      "verdict": "catalogue",
+      "itemId": "DV-04"
+    },
+    {
+      "match": "Stored XSS guestbook /vulnerabilities/xss_s",
+      "verdict": "catalogue",
+      "itemId": "DV-06"
+    },
+    {
+      "match": "Unrestricted file upload leading to PHP execution",
+      "verdict": "catalogue",
+      "itemId": "DV-07"
+    },
+    {
+      "match": "CSRF: Password Change Performed via Unauthenticated GET",
+      "verdict": "catalogue",
+      "itemId": "DV-08"
+    },
+    {
+      "match": "Unauthenticated API Access / Deprecated API v1",
+      "verdict": "extra-tp",
+      "cwe": "CWE-306"
+    },
+    {
+      "match": "ECB Mode with Hardcoded XOR Key",
+      "verdict": "extra-tp",
+      "cwe": "CWE-327"
+    },
+    {
+      "match": "Broken Function-Level Authorization change_user_details.php",
+      "verdict": "extra-tp",
+      "cwe": "CWE-863"
+    },
+    {
+      "match": "Blind SQL Injection /vulnerabilities/sqli_blind",
+      "verdict": "catalogue",
+      "itemId": "DV-09"
+    },
+    {
+      "match": "DOM-based XSS /vulnerabilities/xss_d",
+      "verdict": "catalogue",
+      "itemId": "DV-10"
+    },
+    {
+      "match": "IDOR: authbypass user-data endpoint",
+      "verdict": "extra-tp",
+      "cwe": "CWE-862"
+    }
+  ],
+  "runs": 2,
+  "note": "2 runs attempted: one completed (10/11 at v1.6.0) and one interrupted by container churn (0 findings). Usable n=1; variance reported in Limitations."
+}

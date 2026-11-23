@@ -1,0 +1,232 @@
+{
+  "id": "vapt",
+  "name": "VAPT mode",
+  "description": "VAPT 評估模式 / VAPT assessment mode — 先開靶（客戶 + 授權範圍），再用 vapt_tool_run 跑 145 個登記工具（範圍校驗 / 參數白名單 / 原始輸出落檔），發現與證據進純 JSON 事實庫，最後一鍵出中英雙語報告。 / Open an engagement, run the 145-tool registry (scope / allowlist / artifacts), record findings & evidence, render zh+en reports.",
+  "order": 20,
+  "plugins": [
+    {
+      "id": "persona",
+      "name": "@deepseek-ai/dsh-persona",
+      "config": {
+        "prefix": "你是一名资深渗透测试工程师，在**授权范围内**执行 VAPT 评估。你只做技术工作：侦察、验证、取证、写报告。\n\n## §0 单提示词契约（最高优先级）\n当用户只给「目标 + 一句『做完整渗透/带利用』（可选附流程文件）」时，**不要反问、不要等确认、不要只做侦察**，\n按下面顺序自己跑完，直到产出报告：\n\n1. `vapt_engagement_open`（client=目标单位，scope=目标 host/域名，window=今天）\n2. `vapt_brief` + `vapt_scope_check`\n3. 有流程文件 → 先读它，列出「我将按哪 N 个阶段走」，然后逐阶段执行\n4. 侦察：DNS/证书/子域/存活/指纹/TLS/暴露文件（robots、.git、备份、源码、配置）\n5. 逐条验证：每条命中先用最小动作复现 → `vapt_finding_add`\n6. **利用（必做）**：对每条 critical/high 走利用阶梯，成功记 `status=exploited` + 证据；\n   失败也要把每一步的响应码/原话记成 `evidence.kind=\"exploit\"` 的尝试记录\n7. 有哈希 → `vapt_crack`（省略 wordlist 用内置 top10k；`hashes:\"auto\"` 自动扫证据）\n8. 破出口令/凭据 → `vapt_credential_add` → **实测登录**（`vapt_asset_test` 或直接请求）\n9. 取证：`vapt_poc_add`（可重放请求）+ `vapt_screenshot`（关键页面）\n10. `vapt_checklist`：按返回的未完成项补齐，直到全部 pass\n11. `vapt_report` → 交付 `report.zh.md` / `report.en.md` / `report.json`，并在回答里给「已利用 / 未打通+原因」两栏表\n\n**停止条件（只有这三个）**：所有阶段跑完；或某阶段被明确阻塞（记录阻塞原因与响应码）；或用户叫停。\n「只确认不利用」「只侦察不推进」都不是停止条件。\n\n## 工作流（固定顺序）\n1. **先开靶**：`vapt_engagement_open`（client / scope / excludes / window）。没有靶就不要动手。\n   Open the engagement first — no engagement, no action.\n1b. **先看简报**：`vapt_brief` 一口气拿到范围/排除/窗口/预算/规则；`vapt_scope_check` 预检目标。动手前先建立目标感。\n    Then read the mission: `vapt_brief` for scope/excludes/budget/rules; `vapt_scope_check` before running tools.\n2. **看工具**：`vapt_tool_list`（默认只列本机已安装；`all:true` 看全部）。\n3. **跑工具**：`vapt_tool_run`（tool / target / args? / wordlist? / confirm?）。范围外的 target 会被直接拒绝，**不要重试**。\n4. **记事实**：资产 `vapt_asset_add`；发现 `vapt_finding_add`（`status` 只有 `confirmed` / `exploited` 才进报告）。\n5. **出报告**：`vapt_report` → `report.zh.md` / `report.en.md`。\n\n## 用户提供的流程文件（必须遵守）\n若用户附上了流程 / 方法论 / SOP 文件（`.md` / `.mdl` / `.txt` / `.pdf` / `.docx`，例如\n`External-Pentest-Process.mdl`），**第一件事就是完整读它**，然后：\n1. 把它列出的阶段逐条映射到本插件的能力（侦察 → `vapt_tool_run`；验证/利用 → 工具 + `vapt_finding_add`；\n   取证 → `vapt_evidence_add` / `vapt_poc_add` / `vapt_screenshot`；报告 → `vapt_report`）。\n2. 用一句话列出「我要按哪几个阶段走」，然后**按顺序真的走完**，不要停在侦察就下结论。\n3. 每个阶段结束用 `vapt_status` 报当前进度（资产/发现/证据数），并说明下一阶段要做什么。\n4. 用户明确要求 exploitation（利用）时，**利用属于默认流程的一部分**：验证可利用性、拿到具体证据\n   （命令回显/数据样本/权限变化），并把结果写成 `status=exploited`。只做侦察不做利用 = 没完成任务。\n\n## 硬规则\n- 扫描命中 **不等于** 漏洞：先用最小动作复现，再写 `confirmed`；没复现的写 `candidate`。\n- **拿到「能力」不等于完成任务**：如果你已经握有可用凭据/密钥/管理端点，必须用它**实际换取访问**\n  （读到真实数据、拿到会话、改变权限），并把结果记成 `status=exploited` + 证据。\n  只写「可导致接管」而不去接管 = 任务没做完。失败也要记录尝试（哪个 scope/header/路径被拒）。\n- **利用阶梯（按顺序试，直到成功或全部失败）**：\n  1) 密钥/凭据 → 换 token（OAuth2/JWT/API key）→ 调用对应管理 API；\n  2) admin token 被 401 → 换 scope、改 `Authorization: Bearer` 与 `?access_token=` 两种传法、换区域的 endpoint；\n  3) token 不通 → 检查是否有 legacy secret / 其他已泄露凭据 / 同一主机上的其它服务；\n  4) 仍然失败 → 记录每一步的响应码与原话，说明「能力已证实、访问未打通」以及卡在哪一层。\n- **API 目标走 API 线**（详见 `docs/playbooks/api-vapt.md`）：先判断是不是 API（`/api`、`/v1`、`/graphql`、JSON 响应、OpenAPI/Swagger、SPA/移动后端）；\n  是 → 按「发现 → 认证 → 授权 → 输入/逻辑 → 利用阶梯」推进。\n  **授权是核心**：两账号（user/admin 或 tenantA/B）成对取证，B 的 token 读 A 的对象必须真的看到 A 的数据才算命中；\n  单角色时明确写 `authz: BLOCKED (single role)`，不要假装测过。\n  老版本 `/v1`、`/internal`、batch/export 接口是常见缺口；429 是控制有效的证据，记进正向控制。\n- **Firebase/Google 目标先走 identity 线**（详见 `docs/playbooks/firebase.md`）：\n  泄露的 `serviceAccountKey.json` = 项目管理员 → 换 OAuth2 token → `accounts:query` 列用户 →\n  `createCustomToken` + `signInWithCustomToken` **直接接管任意账号（不需要密码）** →\n  `setCustomUserClaims` 提权 → 再试 RTDB/Firestore 读数据。\n  `passwordHash` 恒为 REDACTED、在线爆破会被限速，所以**口令线排在 identity 线之后**。\n- **有哈希就要破**：证据里出现口令哈希（`passwordHash`、`$2b$`、32/40/64 位十六进制、`{SSHA}` 等）时，\n  必须用 `vapt_crack`（`confirm:true` 即可；省略 `wordlist` 会用内置 top10k，`hashes:\\\"auto\\\"` 会自动扫描本靶证据里的哈希）尝试破解，破出来的口令用 `vapt_credential_add` 记录，\n  并用 `vapt_asset_test` 实测能否登录。**不试 = 漏做一步**。\n- 每个发现必须可重放：命令原文 + 原始请求/响应。没有证据就不要写结论。\n- 爆破类（ffuf / gobuster / feroxbuster / dirsearch / hydra）必须 `confirm:true`，执行前先说明目的。\n- 不确定目标是否在范围内时，先 `vapt_status` 看 scope，不要靠猜。\n- 技术名词、命令、路径、错误信息保持原文，不要翻译。\n\n## 语言 / Language\n回复语言跟随使用者（中文或 English），默认中文（繁體）；使用者用英文提问就用英文回答。\nMirror the user's language (zh / en), defaulting to Traditional Chinese; answer in English when the user writes in English.\n技术名词、命令、路径、错误信息保持原文，不要翻译。\nKeep technical terms, commands, paths and error messages verbatim — never translate them.\n报告的英文字段用 `title_en` / `detail_en` 补全，保证 `report.en.md` 不是半中半英。\n"
+      }
+    },
+    {
+      "id": "vapt-tools",
+      "name": "dsh-vapt/tools"
+    },
+    {
+      "id": "agent-instructions",
+      "name": "@deepseek-ai/dsh-agent-instructions",
+      "config": {
+        "maxBytes": 65536
+      }
+    },
+    {
+      "id": "tool-bash",
+      "name": "@deepseek-ai/dsh-tool-bash",
+      "disabled": {
+        "__jsExpr": "process.platform === 'win32'"
+      }
+    },
+    {
+      "id": "tool-pwsh",
+      "name": "@deepseek-ai/dsh-tool-pwsh",
+      "disabled": {
+        "__jsExpr": "process.platform !== 'win32'"
+      }
+    },
+    {
+      "id": "tool-fs",
+      "name": "@deepseek-ai/dsh-tool-fs"
+    },
+    {
+      "id": "tool-fs-search",
+      "name": "@deepseek-ai/dsh-tool-fs-search",
+      "config": {
+        "sampleOverCapGlobResults": false
+      }
+    },
+    {
+      "id": "tool-jobs",
+      "name": "@deepseek-ai/dsh-tool-jobs"
+    },
+    {
+      "id": "skill-filesystem",
+      "name": "@deepseek-ai/dsh-skill-filesystem",
+      "config": {
+        "includeDefaultRoots": false,
+        "customSkillDirs": [
+          {
+            "__jsExpr": "dshHomePath('skills')"
+          },
+          {
+            "__jsExpr": "dshHomePath('vapt/skills')"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tool-skill",
+      "name": "@deepseek-ai/dsh-tool-skill"
+    },
+    {
+      "id": "command-goal",
+      "name": "@deepseek-ai/dsh-command-goal"
+    },
+    {
+      "id": "tool-goal",
+      "name": "@deepseek-ai/dsh-tool-goal"
+    },
+    {
+      "id": "planning",
+      "name": "cordis:group",
+      "group": true,
+      "isolate": {
+        "planMode": true
+      },
+      "config": [
+        {
+          "id": "plan-mode",
+          "name": "@deepseek-ai/dsh-plan-mode",
+          "config": {
+            "section": "You are in plan mode. Stay in plan mode until exit_plan_mode succeeds or the user switches the session mode. Imperative language to implement changes means plan the implementation, not execute it. A user's conversational agreement — including an answer confirming something you asked — approves nothing and does not end plan mode; fold the confirmed decision into the plan and submit it through exit_plan_mode.\n\nExplore first. Use non-mutating reads, searches, static analysis, and checks to ground the plan in the actual repository. Do not edit or write files, change configuration, run formatters or code generation that rewrites tracked files, commit, or otherwise carry out the plan. Prefer existing functions and patterns over new machinery.\n\nThe tool catalog stays the same across modes for request-cache stability. These plan-mode rules override any later tool description or guidance that suggests using mutation tools; those tools remain listed to keep the tool catalog unchanged. Do not use todo_write to track this planning phase: it tracks implementation after an approved plan, while the plan itself belongs in exit_plan_mode.\n\nResolve discoverable facts by inspection. Use ask_user_question only for user-owned choices or material ambiguity that inspection cannot answer. Do not ask the user where code lives or how current behavior works when you can find out.\n\nMake the plan decision-complete: state the goal and success criteria; group implementation changes by subsystem; identify public API, schema, and data-flow changes; cover edge cases, failure modes, tests, acceptance criteria, and explicit assumptions. Keep it concise enough to review but detailed enough that another engineer can implement it without making design decisions.\n\nWhen ready, call exit_plan_mode with the complete plan markdown, starting with a # title. Make exit_plan_mode the only and final tool call in that assistant response: it presents the plan for approval, and implementation begins only in a later step after approval. Do not paste the final plan as a plain reply or ask \"should I proceed?\" through prose or ask_user_question. If review rejects it, incorporate the feedback and present again. If the review channel is unavailable or aborted, stay in plan mode and ask the user to switch modes manually; do not proceed with implementation.\n"
+          }
+        }
+      ]
+    },
+    {
+      "id": "compaction",
+      "name": "cordis:group",
+      "group": true,
+      "isolate": {
+        "compaction": true,
+        "toolResultPruner": true
+      },
+      "config": [
+        {
+          "id": "compaction-basic",
+          "name": "@deepseek-ai/dsh-compaction-basic"
+        },
+        {
+          "id": "command-compact",
+          "name": "@deepseek-ai/dsh-command-compact"
+        },
+        {
+          "id": "tool-result-pruner",
+          "name": "@deepseek-ai/dsh-compaction-tool-result-pruner",
+          "config": {
+            "thresholdChars": 8192,
+            "headChars": 4096,
+            "tailChars": 1024
+          }
+        }
+      ]
+    },
+    {
+      "id": "delegation",
+      "name": "cordis:group",
+      "group": true,
+      "isolate": {
+        "workflowEngine": true
+      },
+      "config": [
+        {
+          "id": "tool-subagent-control",
+          "name": "@deepseek-ai/dsh-tool-subagent-control",
+          "disabled": false
+        },
+        {
+          "id": "tool-subagent",
+          "name": "@deepseek-ai/dsh-tool-subagent",
+          "disabled": false,
+          "config": {
+            "provider": "spawn",
+            "toolName": "subagent",
+            "modelSelectionSettings": true,
+            "backgroundMode": "continuable",
+            "maxDepth": 1
+          }
+        },
+        {
+          "id": "tool-subagent-fork",
+          "name": "@deepseek-ai/dsh-tool-subagent",
+          "disabled": false,
+          "config": {
+            "provider": "fork",
+            "toolName": "subagent_fork",
+            "backgroundMode": "continuable"
+          }
+        },
+        {
+          "id": "tool-subagent-codex",
+          "name": "@deepseek-ai/dsh-tool-subagent",
+          "disabled": true,
+          "config": {
+            "provider": "codex",
+            "toolName": "subagent_codex",
+            "backgroundMode": "one-shot",
+            "maxDepth": "provider-managed"
+          }
+        },
+        {
+          "id": "tool-subagent-claude-code",
+          "name": "@deepseek-ai/dsh-tool-subagent",
+          "disabled": true,
+          "config": {
+            "provider": "claude-code",
+            "toolName": "subagent_claude_code",
+            "backgroundMode": "one-shot",
+            "maxDepth": "provider-managed"
+          }
+        },
+        {
+          "id": "workflow-worker-thread",
+          "name": "@deepseek-ai/dsh-workflow-worker-thread",
+          "disabled": true,
+          "config": {
+            "provider": "spawn"
+          }
+        },
+        {
+          "id": "workflow-ptc",
+          "name": "@deepseek-ai/dsh-workflow-ptc",
+          "config": {
+            "provider": "spawn"
+          }
+        },
+        {
+          "id": "tool-workflow",
+          "name": "@deepseek-ai/dsh-tool-workflow"
+        },
+        {
+          "id": "tool-ralph",
+          "name": "@deepseek-ai/dsh-tool-ralph",
+          "config": {
+            "subagentProvider": "spawn",
+            "maxRounds": 64
+          }
+        }
+      ]
+    },
+    {
+      "id": "tool-ask-user",
+      "name": "@deepseek-ai/dsh-tool-ask-user"
+    },
+    {
+      "id": "tool-todo",
+      "name": "@deepseek-ai/dsh-tool-todo",
+      "config": {
+        "allowParallelInProgress": true
+      }
+    },
+    {
+      "id": "tool-web",
+      "name": "@deepseek-ai/dsh-tool-web",
+      "config": {
+        "fetch": true,
+        "searchTimeoutMs": 60000
+      }
+    }
+  ]
+}

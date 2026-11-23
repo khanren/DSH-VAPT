@@ -1,0 +1,29 @@
+name: Bug report
+description: Something in dsh-vapt does not behave as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a suspected vulnerability, follow the [security policy](https://github.com/khanren/dsh-vapt/security/policy) to report privately. Use synthetic data for public bug reports.
+  - type: input
+    id: version
+    attributes: { label: dsh-vapt version, placeholder: "1.0.0" }
+    validations: { required: true }
+  - type: input
+    id: dsh
+    attributes: { label: DeepSeek Harness version, placeholder: "0.2.2-rc.5" }
+    validations: { required: true }
+  - type: textarea
+    id: what
+    attributes: { label: What happened, description: Include the tool call and the error text }
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes: { label: What you expected }
+  - type: textarea
+    id: diag
+    attributes:
+      label: Diagnostics
+      description: Output of `cat ~/.dsh/vapt/.applied.json` and `cat ~/.dsh/vapt/preset-declare.json` (redact paths if needed)
+      render: json

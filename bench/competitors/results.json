@@ -1,0 +1,166 @@
+{
+  "schema": "dsh-vapt/competitors@1",
+  "measured_at": "2026-11-22T04:00:00Z",
+  "host": "macOS (Apple Silicon), DSH 0.2.2-rc.5, Docker 29.8.0",
+  "method": "each tool installed into an isolated DSH profile or venv, then booted/executed; failures recorded verbatim; detection scores only where the tool can run without an LLM key",
+  "tools": [
+    {
+      "name": "dsh-vapt",
+      "kind": "DSH plugin (harness + tool layer)",
+      "version": "1.0.0",
+      "install": "ok (tarball / npm)",
+      "boot": "ok (4 presets registered, broken:null)",
+      "needs": "nothing (no LLM key to operate tools)",
+      "tools_exposed": 17,
+      "modes": [
+        "VAPT mode",
+        "VAPT recon mode",
+        "VAPT verify mode",
+        "VAPT report mode"
+      ],
+      "guardrails": "scope enforced in code, argument allowlist, spray caps + lockout stop, per-tool confirm gates",
+      "score": {
+        "juice-shop": "6/6 · composite 100",
+        "dvwa": "5/5 · composite 100"
+      },
+      "measured": "full"
+    },
+    {
+      "name": "dsh-redteam-mode",
+      "kind": "DSH plugin",
+      "version": "0.15.1",
+      "install": "ok (npm 0.15.1)",
+      "boot": "ok (no errors on DSH 0.2.2-rc.5)",
+      "needs": "LLM driving it for actual work",
+      "tools_exposed": 59,
+      "guardrails": "not measured (no benchmark probes)",
+      "score": "not-run: needs LLM budget for a fair agent-level run",
+      "measured": "install+boot only"
+    },
+    {
+      "name": "dsh-atn",
+      "kind": "DSH plugin (adaptive topology multi-agent)",
+      "version": "0.7.0",
+      "install": "ok (npm)",
+      "boot": "ok",
+      "needs": "LLM driving it",
+      "tools_exposed": 23,
+      "score": "not-run",
+      "measured": "install+boot only"
+    },
+    {
+      "name": "dsh-team-rooms",
+      "kind": "DSH plugin (cross-session team rooms)",
+      "version": "1.0.9",
+      "install": "ok (npm)",
+      "boot": "ok",
+      "needs": "none for rooms; LLM for work",
+      "tools_exposed": 10,
+      "score": "not-run (not a scanner)",
+      "measured": "install+boot only"
+    },
+    {
+      "name": "dsh-soul",
+      "kind": "DSH plugin (correction/tool-failure memory)",
+      "version": "0.14.0",
+      "install": "ok (npm)",
+      "boot": "ok",
+      "needs": "none for memory; LLM for work",
+      "tools_exposed": 7,
+      "score": "not-run (not a scanner)",
+      "measured": "install+boot only"
+    },
+    {
+      "name": "cleverer-dsh",
+      "kind": "DSH plugin (execution discipline)",
+      "version": null,
+      "install": "not on npm (GitHub only) — not attempted",
+      "boot": "not-run",
+      "score": "not-run",
+      "measured": "not-attempted"
+    },
+    {
+      "name": "strix",
+      "kind": "LLM agent (CLI, Docker sandbox)",
+      "version": "1.7.0 (PyPI, requires_python >=3.12)",
+      "install": "ok in py3.12 venv; python3.9 fails (requires >=3.12)",
+      "boot": "starts; on first run it pulls ghcr.io/usestrix/strix-sandbox:1.3.0 (Docker required)",
+      "needs": "LLM API key + Docker sandbox image",
+      "score": {
+        "juice-shop": "2/6 catalogue · 10 extra-tp · precision 100%"
+      },
+      "measured": "full",
+      "run": {
+        "model": "deepseek/deepseek-chat (litellm)",
+        "max_turns": 40,
+        "max_budget_usd": 2.0,
+        "requests": 308,
+        "total_tokens": 23780823,
+        "output_tokens": 156137,
+        "duration_min": 35,
+        "status": "budget exhausted (running → killed)",
+        "findings_adjudicated": 12,
+        "catalogue_hits": [
+          "JS-01",
+          "JS-06"
+        ],
+        "extra_true_positives": 10,
+        "false_positives": 0,
+        "recall_on_catalogue": "2/6",
+        "precision_after_adjudication": "12/12"
+      }
+    },
+    {
+      "name": "deadend-cli",
+      "kind": "LLM agent (CLI)",
+      "version": "0.1.15 (PyPI, requires_python >=3.10)",
+      "install": "ok in py3.12 venv",
+      "boot": "FAILED to start — ImportError inside its own deadend_sdk (chat.py → RequesterOutput). Recorded verbatim; retried once.",
+      "needs": "LLM key (not reached)",
+      "score": "not-run: does not start",
+      "measured": "full"
+    },
+    {
+      "name": "HexStrike AI",
+      "kind": "MCP tool backend (90 HTTP tool endpoints + /api/command)",
+      "version": "not on PyPI (GitHub only)",
+      "install": "FAIL via requirements.txt (pip build error on `unicorn`); boots only after 3 ad-hoc installs (aiohttp, selenium, mitmproxy)",
+      "needs": "separate LLM client to drive it",
+      "score": "not-applicable: it is a tool backend, not an agent — it has no findings/report layer to score",
+      "measured": "full",
+      "boot": "ok — Flask on :8888, no auth, no findings store, no report endpoint",
+      "guardrails": "NONE measured: no scope check, no auth, /api/command executes arbitrary shell (verified with an out-of-scope target 10.255.255.1:81 → command executed, exit 7)",
+      "measured_notes": "90 tool routes enumerated; nmap tool returned a real scan result against 127.0.0.1"
+    },
+    {
+      "name": "Nebula",
+      "kind": "LLM agent (assistive)",
+      "version": "nebula-ai 2.0.0 (PyPI, requires_python >=3.10,<=3.13.9)",
+      "install": "ok via PyPI in py3.12 venv",
+      "needs": "LLM key + local vector store init",
+      "score": "not-run: startup did not complete in the measurement window",
+      "measured": "install+startup only",
+      "boot": "`nebula --help` did not return within 60 s (chrombadb/local-first init) — killed; not exercised further"
+    },
+    {
+      "name": "RedAmon",
+      "kind": "platform (Neo4j + 40 tools + Docker)",
+      "version": "GitHub only",
+      "install": "not attempted: clone ok (7285 files) but the stack needs 6 custom-built images (redamon-agent, redamon-ai-attack-surface, redamon-baddns, redamon-capture-proxy, redamon-codefix-sandbox, redamon-docker-broker) plus neo4j:5.26, postgres:16 and a full GVM/OpenVAS suite",
+      "needs": "docker compose stack + LLM key",
+      "score": "not-run: multi-hour image build + LLM key",
+      "measured": "not-attempted",
+      "boot": "not-run"
+    },
+    {
+      "name": "PentAGI",
+      "kind": "platform (Docker multi-service)",
+      "version": "GitHub only",
+      "install": "not run: 12-service docker-compose stack (pentagi, pgvector, pgexporter, scraper, ollama, observability/langfuse overlays) + interactive installer that generates the .env",
+      "needs": "docker compose + LLM key",
+      "score": "not-run: requires accepting the project EULA and generating a 12-service .env; accepting a legal agreement on the user's behalf is out of scope",
+      "measured": "not-attempted",
+      "boot": "not-run"
+    }
+  ]
+}

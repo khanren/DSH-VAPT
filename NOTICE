@@ -1,0 +1,8 @@
+dsh-vapt
+Copyright 2026 khanren
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Targets DeepSeek Harness (DSH) 0.2.2 line. Not affiliated with DeepSeek.
+The plugin registers tools and mode presets through the host's public
+plugin interface.

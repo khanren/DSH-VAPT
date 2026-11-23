@@ -1,0 +1,3 @@
+name: VAPT verify mode
+description: "验证角色 / Verify role — 把线索复现成 confirmed 发现，带可重放证据。 Reproduce leads into confirmed findings with replayable evidence."
+order: 40

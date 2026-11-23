@@ -1,0 +1,163 @@
+{
+  "schema": "dsh-vapt/score@1",
+  "tool": "dsh-vapt",
+  "app": "dvwa",
+  "groundTruth": {
+    "version": "1.6.2",
+    "items": 32,
+    "scored": 10,
+    "controls": 0
+  },
+  "counts": {
+    "tp": 10,
+    "fn": 0,
+    "fp": 0
+  },
+  "metrics": {
+    "recall": 1,
+    "recallCi95": [
+      0.7224598312333834,
+      1
+    ],
+    "precision": 1,
+    "evidenceCoverage": 1,
+    "reproducibility": null,
+    "composite": 100
+  },
+  "weights": {
+    "recall": 0.5294117647058824,
+    "precision": 0.29411764705882354,
+    "evidence": 0.17647058823529413,
+    "reproducibility": 0,
+    "reproducibilityEvaluated": false
+  },
+  "byCategory": {
+    "injection": {
+      "tp": 6,
+      "n": 6
+    },
+    "path-traversal": {
+      "tp": 1,
+      "n": 1
+    },
+    "misconfiguration": {
+      "tp": 1,
+      "n": 1
+    },
+    "file-upload": {
+      "tp": 1,
+      "n": 1
+    },
+    "csrf": {
+      "tp": 1,
+      "n": 1
+    }
+  },
+  "byTier": {
+    "1": {
+      "tp": 5,
+      "n": 5
+    },
+    "2": {
+      "tp": 5,
+      "n": 5
+    }
+  },
+  "perItem": [
+    {
+      "id": "DV-01",
+      "category": "injection",
+      "tier": 1,
+      "cwe": "CWE-89",
+      "status": "TP",
+      "evidence": true,
+      "title": "SQL injection on /vulnerabilities/sqli (id)"
+    },
+    {
+      "id": "DV-02",
+      "category": "injection",
+      "tier": 1,
+      "cwe": "CWE-79",
+      "status": "TP",
+      "evidence": true,
+      "title": "Reflected XSS on /vulnerabilities/xss_r (name)"
+    },
+    {
+      "id": "DV-03",
+      "category": "injection",
+      "tier": 1,
+      "cwe": "CWE-78",
+      "status": "TP",
+      "evidence": true,
+      "title": "OS command injection on /vulnerabilities/exec (ip)"
+    },
+    {
+      "id": "DV-04",
+      "category": "path-traversal",
+      "tier": 2,
+      "cwe": "CWE-22",
+      "status": "TP",
+      "evidence": true,
+      "title": "Local file inclusion on /vulnerabilities/fi (page)"
+    },
+    {
+      "id": "DV-05",
+      "category": "misconfiguration",
+      "tier": 2,
+      "cwe": "CWE-16",
+      "status": "TP",
+      "evidence": true,
+      "title": "Installer /setup.php reachable after install"
+    },
+    {
+      "id": "DV-06",
+      "category": "injection",
+      "tier": 1,
+      "cwe": "CWE-79",
+      "status": "TP",
+      "evidence": true,
+      "title": "Stored XSS via guestbook (xss_s)"
+    },
+    {
+      "id": "DV-07",
+      "category": "file-upload",
+      "tier": 1,
+      "cwe": "CWE-434",
+      "status": "TP",
+      "evidence": true,
+      "title": "Unrestricted file upload leads to PHP execution"
+    },
+    {
+      "id": "DV-08",
+      "category": "csrf",
+      "tier": 2,
+      "cwe": "CWE-352",
+      "status": "TP",
+      "evidence": true,
+      "title": "CSRF: password change without any token"
+    },
+    {
+      "id": "DV-09",
+      "category": "injection",
+      "tier": 2,
+      "cwe": "CWE-89",
+      "status": "TP",
+      "evidence": true,
+      "title": "Blind SQL injection (boolean differential) on /vulnerabilities/sqli_blind"
+    },
+    {
+      "id": "DV-10",
+      "category": "injection",
+      "tier": 2,
+      "cwe": "CWE-79",
+      "status": "TP",
+      "evidence": true,
+      "title": "DOM XSS on /vulnerabilities/xss_d (default param reaches document.write)"
+    }
+  ],
+  "falsePositives": [],
+  "measuredAt": "2026-11-22T09:16:56.773Z",
+  "durationMs": 8675,
+  "runs": 1,
+  "report": "/var/folders/ty/lmcrxcld0msbfy_yv991bm680000gp/T/vapt-real-iLVc9C/engagements/bench-dvwa-20261122-2b6e/report.zh.md"
+}

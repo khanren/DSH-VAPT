@@ -1,0 +1,64 @@
+name: ci
+
+on:
+  push: { branches: [main] }
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: privacy and data integrity checks
+        run: npm run test:privacy
+      - name: functional checks
+        run: node scripts/verify.mjs
+      - name: stability checks
+        run: node scripts/stress.mjs
+      - name: end-to-end (skips missing binaries)
+        run: node scripts/e2e.mjs
+      - name: mcp server smoke test
+        run: node scripts/mcp-smoke.mjs
+      - name: client bundle smoke test
+        run: node scripts/client-smoke.mjs
+      - name: host compatibility gate
+        run: node scripts/host-compat.mjs
+      - name: scoring-script regression tests
+        run: node scripts/bench-tests.mjs
+      - name: synthetic benchmark
+        run: node bench/run.mjs
+      - name: package contents
+        run: npm pack --dry-run
+      - name: detect DSH for the clean installation test
+        id: dsh
+        run: |
+          if command -v dsh >/dev/null || [[ -d "/Applications/DeepSeek Harness.app" ]]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "DSH is absent on this runner. Skipping the clean installation test."
+          fi
+      - name: clean install check
+        if: steps.dsh.outputs.available == 'true'
+        run: npm run check:install
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: test
+    runs-on: ubuntu-latest
+    permissions: { contents: read, id-token: write }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, registry-url: 'https://registry.npmjs.org' }
+      - run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,0 +1,3 @@
+name: VAPT recon mode
+description: "侦察角色 / Recon role — 只收集资产与指纹，不写结论；发现交给 verify。 Assets and fingerprints only; no conclusions, hand off to verify."
+order: 30

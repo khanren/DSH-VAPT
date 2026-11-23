@@ -1,0 +1,129 @@
+{
+  "schema": "dsh-vapt/score@1",
+  "tool": "dsh-redteam-mode",
+  "app": "juice-shop",
+  "groundTruth": {
+    "version": "1.4.0",
+    "scored": 20
+  },
+  "counts": {
+    "tp": 14,
+    "fn": 6,
+    "fp": 0,
+    "extraTp": 1
+  },
+  "metrics": {
+    "recall": 0.7,
+    "recallCi95": [
+      0.4810232237710206,
+      0.854524726031006
+    ],
+    "precision": 1,
+    "evidenceCoverage": null,
+    "reproducibility": null,
+    "composite": null,
+    "note": "composite 不计算：证据哈希/可复现性未测"
+  },
+  "perItem": [
+    {
+      "id": "JS-01",
+      "status": "TP",
+      "title": "SQL injection in /rest/products/search (q=')) )"
+    },
+    {
+      "id": "JS-02",
+      "status": "TP",
+      "title": "Admin configuration readable without authentication"
+    },
+    {
+      "id": "JS-03",
+      "status": "FN",
+      "title": "/rest/memories leaks user photos and emails"
+    },
+    {
+      "id": "JS-04",
+      "status": "TP",
+      "title": "Directory listing on /ftp"
+    },
+    {
+      "id": "JS-05",
+      "status": "TP",
+      "title": "Missing CSP and HSTS headers"
+    },
+    {
+      "id": "JS-06",
+      "status": "TP",
+      "title": "Authentication bypass via SQL injection on /rest/user/login"
+    },
+    {
+      "id": "JS-07",
+      "status": "FN",
+      "title": "Unauthenticated product modification via PUT /api/Products/{id}"
+    },
+    {
+      "id": "JS-08",
+      "status": "FN",
+      "title": "Mass assignment: self-registration with role=admin"
+    },
+    {
+      "id": "JS-09",
+      "status": "TP",
+      "title": "JWT alg=none accepted by /api/Users"
+    },
+    {
+      "id": "JS-10",
+      "status": "TP",
+      "title": "Null-byte extension bypass on /ftp exposes package.json.bak"
+    },
+    {
+      "id": "JS-11",
+      "status": "TP",
+      "title": "Any customer token can enumerate all users via /api/Users"
+    },
+    {
+      "id": "JS-12",
+      "status": "TP",
+      "title": "Prometheus /metrics exposed without authentication"
+    },
+    {
+      "id": "JS-13",
+      "status": "TP",
+      "title": "Directory listing on /support/logs exposes access logs"
+    },
+    {
+      "id": "JS-14",
+      "status": "TP",
+      "title": "Error stack disclosure on /api/Products/{id}/reviews"
+    },
+    {
+      "id": "JS-15",
+      "status": "TP",
+      "title": "JWT payload carries the password hash"
+    },
+    {
+      "id": "JS-16",
+      "status": "TP",
+      "title": "Basket BOLA: any customer token reads other baskets"
+    },
+    {
+      "id": "JS-17",
+      "status": "FN",
+      "title": "Customer token can create products"
+    },
+    {
+      "id": "JS-18",
+      "status": "FN",
+      "title": "Free deluxe membership via paymentMode \"none\""
+    },
+    {
+      "id": "JS-19",
+      "status": "TP",
+      "title": "Security-question endpoint enumerates registered emails"
+    },
+    {
+      "id": "JS-20",
+      "status": "FN",
+      "title": "Negative basket quantity accepted"
+    }
+  ]
+}

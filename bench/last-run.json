@@ -1,0 +1,24 @@
+{
+  "schema": "dsh-vapt/bench@1",
+  "fixture": "bench/fixture.mjs",
+  "probes": 6,
+  "detected": 6,
+  "detection_rate": "6/6",
+  "deliverable": 2,
+  "evidence_coverage": "2/2",
+  "dedup_stable": true,
+  "report": {
+    "mermaid": true,
+    "remediation": true,
+    "cwe": false
+  },
+  "elapsed_ms": 44,
+  "rows": [
+    "PASS  admin without auth",
+    "PASS  idor on /api/user",
+    "PASS  error-based SQLi on /search",
+    "PASS  open redirect on /redirect",
+    "PASS  info leak on /health",
+    "PASS  missing security headers"
+  ]
+}

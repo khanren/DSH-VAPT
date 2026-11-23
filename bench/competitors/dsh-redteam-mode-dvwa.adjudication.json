@@ -1,0 +1,68 @@
+{
+  "schema": "dsh-vapt/adjudication@1",
+  "tool": "dsh-redteam-mode",
+  "app": "dvwa",
+  "groundTruth": "1.6.0",
+  "source": "headless 实测（~8 分钟，DeepSeek 驱动，带 login cookie + admin/password）",
+  "time": "~8 min",
+  "cost": "DeepSeek · 单轮",
+  "items": [
+    {
+      "match": "SQL 注入（UNION 拖库）/vulnerabilities/sqli",
+      "verdict": "catalogue",
+      "itemId": "DV-01"
+    },
+    {
+      "match": "反射型 XSS /vulnerabilities/xss_r",
+      "verdict": "catalogue",
+      "itemId": "DV-02"
+    },
+    {
+      "match": "OS 命令注入 /vulnerabilities/exec",
+      "verdict": "catalogue",
+      "itemId": "DV-03"
+    },
+    {
+      "match": "本地文件包含 /vulnerabilities/fi",
+      "verdict": "catalogue",
+      "itemId": "DV-04"
+    },
+    {
+      "match": "存储型 XSS guestbook",
+      "verdict": "catalogue",
+      "itemId": "DV-06"
+    },
+    {
+      "match": "任意文件上传",
+      "verdict": "catalogue",
+      "itemId": "DV-07"
+    },
+    {
+      "match": "CSRF（无 token 修改管理员密码）",
+      "verdict": "catalogue",
+      "itemId": "DV-08"
+    },
+    {
+      "match": "登录处 SQL 注入 / 认证绕过（brute 模块）",
+      "verdict": "extra-tp",
+      "cwe": "CWE-89"
+    },
+    {
+      "match": "未授权访问 Setup/Reset 页面（#11）",
+      "verdict": "catalogue",
+      "itemId": "DV-05"
+    },
+    {
+      "match": "盲注 SQL 注入（布尔盲注）",
+      "verdict": "catalogue",
+      "itemId": "DV-09"
+    },
+    {
+      "match": "DOM 型 XSS",
+      "verdict": "catalogue",
+      "itemId": "DV-10"
+    }
+  ],
+  "runs": 2,
+  "note": "DVWA 共跑 3 轮：r1 命中 10/10、r3 命中 9/10（漏 setup.php）、r2 被 420s 超时截断（无结论，不计入）。表中采用完整一轮 r1 的结果；方差见 PAPER.md。"
+}

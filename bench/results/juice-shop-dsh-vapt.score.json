@@ -1,0 +1,261 @@
+{
+  "schema": "dsh-vapt/score@1",
+  "tool": "dsh-vapt",
+  "app": "juice-shop",
+  "groundTruth": {
+    "version": "1.6.2",
+    "items": 32,
+    "scored": 20,
+    "controls": 2
+  },
+  "counts": {
+    "tp": 20,
+    "fn": 0,
+    "fp": 0
+  },
+  "metrics": {
+    "recall": 1,
+    "recallCi95": [
+      0.8388698745050667,
+      1
+    ],
+    "precision": 1,
+    "evidenceCoverage": 1,
+    "reproducibility": 1,
+    "composite": 100
+  },
+  "weights": {
+    "recall": 0.45,
+    "precision": 0.25,
+    "evidence": 0.15,
+    "reproducibility": 0.15,
+    "reproducibilityEvaluated": true
+  },
+  "byCategory": {
+    "injection": {
+      "tp": 1,
+      "n": 1
+    },
+    "access-control": {
+      "tp": 6,
+      "n": 6
+    },
+    "data-exposure": {
+      "tp": 5,
+      "n": 5
+    },
+    "misconfiguration": {
+      "tp": 3,
+      "n": 3
+    },
+    "authentication": {
+      "tp": 2,
+      "n": 2
+    },
+    "path-traversal": {
+      "tp": 1,
+      "n": 1
+    },
+    "business-logic": {
+      "tp": 2,
+      "n": 2
+    }
+  },
+  "byTier": {
+    "1": {
+      "tp": 12,
+      "n": 12
+    },
+    "2": {
+      "tp": 8,
+      "n": 8
+    }
+  },
+  "perItem": [
+    {
+      "id": "JS-01",
+      "category": "injection",
+      "tier": 1,
+      "cwe": "CWE-89",
+      "status": "TP",
+      "evidence": true,
+      "title": "SQL injection in /rest/products/search (q=')) )"
+    },
+    {
+      "id": "JS-02",
+      "category": "access-control",
+      "tier": 1,
+      "cwe": "CWE-306",
+      "status": "TP",
+      "evidence": true,
+      "title": "Admin configuration readable without authentication"
+    },
+    {
+      "id": "JS-03",
+      "category": "data-exposure",
+      "tier": 1,
+      "cwe": "CWE-200",
+      "status": "TP",
+      "evidence": true,
+      "title": "/rest/memories leaks user photos and emails"
+    },
+    {
+      "id": "JS-04",
+      "category": "misconfiguration",
+      "tier": 2,
+      "cwe": "CWE-548",
+      "status": "TP",
+      "evidence": true,
+      "title": "Directory listing on /ftp"
+    },
+    {
+      "id": "JS-05",
+      "category": "misconfiguration",
+      "tier": 2,
+      "cwe": "CWE-693",
+      "status": "TP",
+      "evidence": true,
+      "title": "Missing CSP and HSTS headers"
+    },
+    {
+      "id": "JS-06",
+      "category": "authentication",
+      "tier": 1,
+      "cwe": "CWE-89",
+      "status": "TP",
+      "evidence": true,
+      "title": "Authentication bypass via SQL injection on /rest/user/login"
+    },
+    {
+      "id": "JS-07",
+      "category": "access-control",
+      "tier": 1,
+      "cwe": "CWE-306",
+      "status": "TP",
+      "evidence": true,
+      "title": "Unauthenticated product modification via PUT /api/Products/{id}"
+    },
+    {
+      "id": "JS-08",
+      "category": "access-control",
+      "tier": 1,
+      "cwe": "CWE-269",
+      "status": "TP",
+      "evidence": true,
+      "title": "Mass assignment: self-registration with role=admin"
+    },
+    {
+      "id": "JS-09",
+      "category": "authentication",
+      "tier": 1,
+      "cwe": "CWE-347",
+      "status": "TP",
+      "evidence": true,
+      "title": "JWT alg=none accepted by /api/Users"
+    },
+    {
+      "id": "JS-10",
+      "category": "path-traversal",
+      "tier": 2,
+      "cwe": "CWE-22",
+      "status": "TP",
+      "evidence": true,
+      "title": "Null-byte extension bypass on /ftp exposes package.json.bak"
+    },
+    {
+      "id": "JS-11",
+      "category": "access-control",
+      "tier": 1,
+      "cwe": "CWE-862",
+      "status": "TP",
+      "evidence": true,
+      "title": "Any customer token can enumerate all users via /api/Users"
+    },
+    {
+      "id": "JS-12",
+      "category": "misconfiguration",
+      "tier": 2,
+      "cwe": "CWE-306",
+      "status": "TP",
+      "evidence": true,
+      "title": "Prometheus /metrics exposed without authentication"
+    },
+    {
+      "id": "JS-13",
+      "category": "data-exposure",
+      "tier": 2,
+      "cwe": "CWE-548",
+      "status": "TP",
+      "evidence": true,
+      "title": "Directory listing on /support/logs exposes access logs"
+    },
+    {
+      "id": "JS-14",
+      "category": "data-exposure",
+      "tier": 2,
+      "cwe": "CWE-209",
+      "status": "TP",
+      "evidence": true,
+      "title": "Error stack disclosure on /api/Products/{id}/reviews"
+    },
+    {
+      "id": "JS-15",
+      "category": "data-exposure",
+      "tier": 1,
+      "cwe": "CWE-200",
+      "status": "TP",
+      "evidence": true,
+      "title": "JWT payload carries the password hash"
+    },
+    {
+      "id": "JS-16",
+      "category": "access-control",
+      "tier": 1,
+      "cwe": "CWE-639",
+      "status": "TP",
+      "evidence": true,
+      "title": "Basket BOLA: any customer token reads other baskets"
+    },
+    {
+      "id": "JS-17",
+      "category": "access-control",
+      "tier": 1,
+      "cwe": "CWE-862",
+      "status": "TP",
+      "evidence": true,
+      "title": "Customer token can create products"
+    },
+    {
+      "id": "JS-18",
+      "category": "business-logic",
+      "tier": 1,
+      "cwe": "CWE-840",
+      "status": "TP",
+      "evidence": true,
+      "title": "Free deluxe membership via paymentMode \"none\""
+    },
+    {
+      "id": "JS-19",
+      "category": "data-exposure",
+      "tier": 2,
+      "cwe": "CWE-200",
+      "status": "TP",
+      "evidence": true,
+      "title": "Security-question endpoint enumerates registered emails"
+    },
+    {
+      "id": "JS-20",
+      "category": "business-logic",
+      "tier": 2,
+      "cwe": "CWE-20",
+      "status": "TP",
+      "evidence": true,
+      "title": "Negative basket quantity accepted"
+    }
+  ],
+  "falsePositives": [],
+  "measuredAt": "2026-11-22T09:17:14.056Z",
+  "durationMs": 3428,
+  "runs": 3,
+  "report": "/var/folders/ty/lmcrxcld0msbfy_yv991bm680000gp/T/vapt-real-m2quBF/engagements/bench-juice-shop-20261122-7ab2/report.zh.md"
+}

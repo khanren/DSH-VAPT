@@ -1,0 +1,58 @@
+{
+  "schema": "dsh-vapt/bench-real@1",
+  "ranAt": "2026-11-21T19:24:45.547Z",
+  "tool": {
+    "name": "dsh-vapt",
+    "version": "1.0.0"
+  },
+  "targets": [
+    {
+      "target": "juice-shop",
+      "url": "http://127.0.0.1:3000",
+      "probes": 5,
+      "detected": 0,
+      "deliverable": 0,
+      "evidenceCoverage": "0/0",
+      "dedupStable": true,
+      "elapsedMs": 3138,
+      "rows": [
+        "ERROR sql-injection-product-search: Failed to parse URL from [object Object]/rest/products/search?q='",
+        "FAIL  sql-injection-product-search",
+        "ERROR broken-access-control-admin-config: Failed to parse URL from [object Object]/rest/admin/application-configuration",
+        "FAIL  broken-access-control-admin-config",
+        "ERROR sensitive-data-memories: Failed to parse URL from [object Object]/rest/memories",
+        "FAIL  sensitive-data-memories",
+        "ERROR directory-listing-ftp: Failed to parse URL from [object Object]/ftp/",
+        "FAIL  directory-listing-ftp",
+        "ERROR missing-security-headers: Failed to parse URL from [object Object]/",
+        "FAIL  missing-security-headers"
+      ],
+      "report": "/var/folders/ty/lmcrxcld0msbfy_yv991bm680000gp/T/vapt-real-0Kj6xX/engagements/juice-shop-20261121-22ed/report.zh.md"
+    },
+    {
+      "target": "dvwa",
+      "url": "http://127.0.0.1:4280",
+      "probes": 5,
+      "detected": 0,
+      "deliverable": 0,
+      "evidenceCoverage": "0/0",
+      "dedupStable": true,
+      "elapsedMs": 5985,
+      "rows": [
+        "FAIL  sqli",
+        "FAIL  reflected-xss",
+        "FAIL  command-injection",
+        "FAIL  local-file-inclusion",
+        "ERROR setup-page-exposed: Cannot read properties of undefined (reading 'current')",
+        "FAIL  setup-page-exposed"
+      ],
+      "report": "/var/folders/ty/lmcrxcld0msbfy_yv991bm680000gp/T/vapt-real-0Kj6xX/engagements/dvwa-20261121-6b54/report.zh.md"
+    }
+  ],
+  "aggregate": {
+    "probes": 10,
+    "detected": 0,
+    "deliverable": 0,
+    "dedupStable": true
+  }
+}

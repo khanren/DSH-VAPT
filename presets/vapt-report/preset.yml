@@ -1,0 +1,3 @@
+name: VAPT report mode
+description: "报告角色 / Report role — 只读事实库，产出双语报告与修复建议。 Read-only over the store; produce the bilingual report and remediation."
+order: 50

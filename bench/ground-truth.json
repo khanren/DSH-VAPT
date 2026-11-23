@@ -1,0 +1,450 @@
+{
+  "schema": "dsh-vapt/ground-truth@1",
+  "version": "1.6.2",
+  "frozen_at": "2026-11-21T00:00:00Z",
+  "notes": "Frozen ground truth (v1.4.0). v1.3.0 closes the gaps that BOTH competitor runs exposed: /metrics exposure, /support/logs listing, error-stack disclosure, JWT carrying the password hash, basket BOLA, and customer-created products. Every item hand-verified against the pinned image. v1.4.0 adds the last three items competitors reported: free deluxe membership (paymentMode=none), security-question user enumeration, and negative basket quantity. v1.5.0 expands the DVWA catalogue from 5 to 8 items: stored XSS, arbitrary file upload (PHP executes), and CSRF password change. v1.6.0 closes the last capability gap: DVWA blind SQLi (boolean differential), DOM XSS (source→sink), and unauthenticated user-data API (IDOR/BFLA) — all reported by competitors but previously not probed by us. v1.6.1: DV-11 reworded — the endpoint requires a session (anonymous returns 404), so it is BFLA (any authenticated user reads all users), not unauthenticated access. v1.6.2: DV-11 removed — /vulnerabilities/authbypass/get_user_data.php returned 200 on one build/session state and 404 on a clean rebuild, so it fails the 'deterministically reachable' inclusion criterion. It stays an extra-tp in adjudications instead of a catalogue item.",
+  "apps": {
+    "juice-shop": {
+      "image": "bkimminich/juice-shop",
+      "pinned_digest": "sha256:adaf6a6ca50f772dff7d2fe56972c659e81a61e0dbbe607c2b39fefd436e6153",
+      "url": "http://127.0.0.1:3000",
+      "setup": "docker run --rm -p 127.0.0.1:3000:3000 bkimminich/juice-shop"
+    },
+    "dvwa": {
+      "image": "ghcr.io/digininja/dvwa",
+      "url": "http://127.0.0.1:4281",
+      "setup": "docker compose -f bench/docker-compose.dvwa.yml up -d",
+      "status": "not-run-in-this-revision",
+      "reason": "official image needs a MySQL sidecar; compose file provided, execution pending"
+    }
+  },
+  "items": [
+    {
+      "id": "JS-01",
+      "app": "juice-shop",
+      "category": "injection",
+      "cwe": "CWE-89",
+      "severity": "critical",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "SQL injection in /rest/products/search (q=')) )",
+      "match": {
+        "path": "/rest/products/search",
+        "param": "q"
+      }
+    },
+    {
+      "id": "JS-02",
+      "app": "juice-shop",
+      "category": "access-control",
+      "cwe": "CWE-306",
+      "severity": "high",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "Admin configuration readable without authentication",
+      "match": {
+        "path": "/rest/admin/application-configuration"
+      }
+    },
+    {
+      "id": "JS-03",
+      "app": "juice-shop",
+      "category": "data-exposure",
+      "cwe": "CWE-200",
+      "severity": "high",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "/rest/memories leaks user photos and emails",
+      "match": {
+        "path": "/rest/memories"
+      }
+    },
+    {
+      "id": "JS-04",
+      "app": "juice-shop",
+      "category": "misconfiguration",
+      "cwe": "CWE-548",
+      "severity": "medium",
+      "tier": 2,
+      "expected": "vulnerable",
+      "title": "Directory listing on /ftp",
+      "match": {
+        "path": "/ftp"
+      }
+    },
+    {
+      "id": "JS-05",
+      "app": "juice-shop",
+      "category": "misconfiguration",
+      "cwe": "CWE-693",
+      "severity": "low",
+      "tier": 2,
+      "expected": "vulnerable",
+      "title": "Missing CSP and HSTS headers",
+      "match": {
+        "path": "/",
+        "kind": "headers"
+      }
+    },
+    {
+      "id": "JS-06",
+      "app": "juice-shop",
+      "category": "authentication",
+      "cwe": "CWE-89",
+      "severity": "critical",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "Authentication bypass via SQL injection on /rest/user/login",
+      "match": {
+        "path": "/rest/user/login"
+      }
+    },
+    {
+      "id": "JS-N1",
+      "app": "juice-shop",
+      "category": "negative-control",
+      "cwe": null,
+      "severity": "info",
+      "tier": 1,
+      "expected": "secure",
+      "title": "/rest/admin/application-version is public by design — flagging it is a false positive",
+      "match": {
+        "path": "/rest/admin/application-version"
+      }
+    },
+    {
+      "id": "JS-N2",
+      "app": "juice-shop",
+      "category": "negative-control",
+      "cwe": null,
+      "severity": "info",
+      "tier": 1,
+      "expected": "secure",
+      "title": "/rest/products (public catalogue) must not be reported as data exposure",
+      "match": {
+        "path": "/rest/products"
+      }
+    },
+    {
+      "id": "DV-01",
+      "app": "dvwa",
+      "category": "injection",
+      "cwe": "CWE-89",
+      "severity": "critical",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "SQL injection on /vulnerabilities/sqli (id)",
+      "match": {
+        "path": "/vulnerabilities/sqli",
+        "param": "id"
+      }
+    },
+    {
+      "id": "DV-02",
+      "app": "dvwa",
+      "category": "injection",
+      "cwe": "CWE-79",
+      "severity": "high",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "Reflected XSS on /vulnerabilities/xss_r (name)",
+      "match": {
+        "path": "/vulnerabilities/xss_r",
+        "param": "name"
+      }
+    },
+    {
+      "id": "DV-03",
+      "app": "dvwa",
+      "category": "injection",
+      "cwe": "CWE-78",
+      "severity": "critical",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "OS command injection on /vulnerabilities/exec (ip)",
+      "match": {
+        "path": "/vulnerabilities/exec",
+        "param": "ip"
+      }
+    },
+    {
+      "id": "DV-04",
+      "app": "dvwa",
+      "category": "path-traversal",
+      "cwe": "CWE-22",
+      "severity": "high",
+      "tier": 2,
+      "expected": "vulnerable",
+      "title": "Local file inclusion on /vulnerabilities/fi (page)",
+      "match": {
+        "path": "/vulnerabilities/fi",
+        "param": "page"
+      }
+    },
+    {
+      "id": "DV-05",
+      "app": "dvwa",
+      "category": "misconfiguration",
+      "cwe": "CWE-16",
+      "severity": "medium",
+      "tier": 2,
+      "expected": "vulnerable",
+      "title": "Installer /setup.php reachable after install",
+      "match": {
+        "path": "/setup.php"
+      }
+    },
+    {
+      "id": "JS-07",
+      "app": "juice-shop",
+      "category": "access-control",
+      "cwe": "CWE-306",
+      "severity": "critical",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "Unauthenticated product modification via PUT /api/Products/{id}",
+      "match": {
+        "path": "/api/Products"
+      }
+    },
+    {
+      "id": "JS-08",
+      "app": "juice-shop",
+      "category": "access-control",
+      "cwe": "CWE-269",
+      "severity": "critical",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "Mass assignment: self-registration with role=admin",
+      "match": {
+        "path": "/api/Users"
+      }
+    },
+    {
+      "id": "JS-09",
+      "app": "juice-shop",
+      "category": "authentication",
+      "cwe": "CWE-347",
+      "severity": "critical",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "JWT alg=none accepted by /api/Users",
+      "match": {
+        "path": "/api/Users",
+        "kind": "jwt"
+      }
+    },
+    {
+      "id": "JS-10",
+      "app": "juice-shop",
+      "category": "path-traversal",
+      "cwe": "CWE-22",
+      "severity": "high",
+      "tier": 2,
+      "expected": "vulnerable",
+      "title": "Null-byte extension bypass on /ftp exposes package.json.bak",
+      "match": {
+        "path": "/ftp"
+      }
+    },
+    {
+      "id": "JS-11",
+      "app": "juice-shop",
+      "category": "access-control",
+      "cwe": "CWE-862",
+      "severity": "high",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "Any customer token can enumerate all users via /api/Users",
+      "match": {
+        "path": "/api/Users",
+        "kind": "enumeration"
+      }
+    },
+    {
+      "id": "JS-12",
+      "app": "juice-shop",
+      "category": "misconfiguration",
+      "cwe": "CWE-306",
+      "severity": "medium",
+      "tier": 2,
+      "expected": "vulnerable",
+      "title": "Prometheus /metrics exposed without authentication",
+      "match": {
+        "path": "/metrics"
+      }
+    },
+    {
+      "id": "JS-13",
+      "app": "juice-shop",
+      "category": "data-exposure",
+      "cwe": "CWE-548",
+      "severity": "medium",
+      "tier": 2,
+      "expected": "vulnerable",
+      "title": "Directory listing on /support/logs exposes access logs",
+      "match": {
+        "path": "/support/logs"
+      }
+    },
+    {
+      "id": "JS-14",
+      "app": "juice-shop",
+      "category": "data-exposure",
+      "cwe": "CWE-209",
+      "severity": "low",
+      "tier": 2,
+      "expected": "vulnerable",
+      "title": "Error stack disclosure on /api/Products/{id}/reviews",
+      "match": {
+        "path": "/api/Products"
+      }
+    },
+    {
+      "id": "JS-15",
+      "app": "juice-shop",
+      "category": "data-exposure",
+      "cwe": "CWE-200",
+      "severity": "medium",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "JWT payload carries the password hash",
+      "match": {
+        "path": "/rest/user/login",
+        "kind": "jwt"
+      }
+    },
+    {
+      "id": "JS-16",
+      "app": "juice-shop",
+      "category": "access-control",
+      "cwe": "CWE-639",
+      "severity": "high",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "Basket BOLA: any customer token reads other baskets",
+      "match": {
+        "path": "/rest/basket"
+      }
+    },
+    {
+      "id": "JS-17",
+      "app": "juice-shop",
+      "category": "access-control",
+      "cwe": "CWE-862",
+      "severity": "high",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "Customer token can create products",
+      "match": {
+        "path": "/api/Products"
+      }
+    },
+    {
+      "id": "JS-18",
+      "app": "juice-shop",
+      "category": "business-logic",
+      "cwe": "CWE-840",
+      "severity": "high",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "Free deluxe membership via paymentMode \"none\"",
+      "match": {
+        "path": "/rest/deluxe-membership"
+      }
+    },
+    {
+      "id": "JS-19",
+      "app": "juice-shop",
+      "category": "data-exposure",
+      "cwe": "CWE-200",
+      "severity": "low",
+      "tier": 2,
+      "expected": "vulnerable",
+      "title": "Security-question endpoint enumerates registered emails",
+      "match": {
+        "path": "/rest/user/security-question"
+      }
+    },
+    {
+      "id": "JS-20",
+      "app": "juice-shop",
+      "category": "business-logic",
+      "cwe": "CWE-20",
+      "severity": "medium",
+      "tier": 2,
+      "expected": "vulnerable",
+      "title": "Negative basket quantity accepted",
+      "match": {
+        "path": "/api/BasketItems"
+      }
+    },
+    {
+      "id": "DV-06",
+      "app": "dvwa",
+      "category": "injection",
+      "cwe": "CWE-79",
+      "severity": "high",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "Stored XSS via guestbook (xss_s)",
+      "match": {
+        "path": "/vulnerabilities/xss_s"
+      }
+    },
+    {
+      "id": "DV-07",
+      "app": "dvwa",
+      "category": "file-upload",
+      "cwe": "CWE-434",
+      "severity": "critical",
+      "tier": 1,
+      "expected": "vulnerable",
+      "title": "Unrestricted file upload leads to PHP execution",
+      "match": {
+        "path": "/vulnerabilities/upload"
+      }
+    },
+    {
+      "id": "DV-08",
+      "app": "dvwa",
+      "category": "csrf",
+      "cwe": "CWE-352",
+      "severity": "high",
+      "tier": 2,
+      "expected": "vulnerable",
+      "title": "CSRF: password change without any token",
+      "match": {
+        "path": "/vulnerabilities/csrf"
+      }
+    },
+    {
+      "id": "DV-09",
+      "app": "dvwa",
+      "category": "injection",
+      "cwe": "CWE-89",
+      "severity": "high",
+      "tier": 2,
+      "expected": "vulnerable",
+      "title": "Blind SQL injection (boolean differential) on /vulnerabilities/sqli_blind",
+      "match": {
+        "path": "/vulnerabilities/sqli_blind",
+        "param": "id"
+      }
+    },
+    {
+      "id": "DV-10",
+      "app": "dvwa",
+      "category": "injection",
+      "cwe": "CWE-79",
+      "severity": "high",
+      "tier": 2,
+      "expected": "vulnerable",
+      "title": "DOM XSS on /vulnerabilities/xss_d (default param reaches document.write)",
+      "match": {
+        "path": "/vulnerabilities/xss_d",
+        "param": "default"
+      }
+    }
+  ]
+}

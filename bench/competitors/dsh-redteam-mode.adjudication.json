@@ -1,0 +1,103 @@
+{
+  "schema": "dsh-vapt/adjudication@1",
+  "tool": "dsh-redteam-mode",
+  "app": "juice-shop",
+  "groundTruth": "1.4.0",
+  "source": "/tmp/rt-headless.log（headless 运行 ~5 分钟，14 条发现；worker preset 在 headless 下全部 pending，退化为单 agent）",
+  "items": [
+    {
+      "match": "登录 SQL 注入导致管理员认证绕过",
+      "verdict": "catalogue",
+      "itemId": "JS-06"
+    },
+    {
+      "match": "JWT 签名校验绕过 alg:none",
+      "verdict": "catalogue",
+      "itemId": "JS-09"
+    },
+    {
+      "match": "商品搜索未授权 SQL 注入",
+      "verdict": "catalogue",
+      "itemId": "JS-01"
+    },
+    {
+      "match": "FTP 敏感文件泄露 + 空字节绕过",
+      "verdict": "catalogue",
+      "itemId": "JS-10"
+    },
+    {
+      "match": "FTP 目录可列（同上一条的证据）",
+      "verdict": "catalogue",
+      "itemId": "JS-04"
+    },
+    {
+      "match": "管理配置未授权",
+      "verdict": "catalogue",
+      "itemId": "JS-02"
+    },
+    {
+      "match": "安全头缺失 / CORS 过宽",
+      "verdict": "catalogue",
+      "itemId": "JS-05"
+    },
+    {
+      "match": "任意登录用户枚举全部用户",
+      "verdict": "catalogue",
+      "itemId": "JS-11"
+    },
+    {
+      "match": "robots.txt 泄露 /ftp",
+      "verdict": "extra-tp",
+      "cwe": "CWE-200"
+    },
+    {
+      "match": "/metrics 未授权",
+      "verdict": "catalogue",
+      "itemId": "JS-12"
+    },
+    {
+      "match": "/support/logs 目录列表与访问日志",
+      "verdict": "catalogue",
+      "itemId": "JS-13"
+    },
+    {
+      "match": "详细错误堆栈",
+      "verdict": "catalogue",
+      "itemId": "JS-14"
+    },
+    {
+      "match": "JWT 中泄露密码哈希",
+      "verdict": "catalogue",
+      "itemId": "JS-15"
+    },
+    {
+      "match": "购物车 IDOR",
+      "verdict": "catalogue",
+      "itemId": "JS-16"
+    },
+    {
+      "match": "公开接口 PII（feedbacks/reviews/security-question）",
+      "verdict": "catalogue",
+      "itemId": "JS-19"
+    },
+    {
+      "match": "/rest/memories 泄露",
+      "verdict": "catalogue",
+      "itemId": "JS-03"
+    },
+    {
+      "match": "Mass Assignment / role=admin",
+      "verdict": "catalogue",
+      "itemId": "JS-08"
+    },
+    {
+      "match": "deluxe 会员 paymentMode",
+      "verdict": "catalogue",
+      "itemId": "JS-18"
+    }
+  ],
+  "time": "~5 min/round",
+  "cost": "DeepSeek · 单轮",
+  "runs": 3,
+  "note": "Juice Shop 3 轮：85% / 85% / 70%（mean 80.0%，σ 7.1）。表中为 r1 的逐条结果。"
+}

@@ -1,0 +1,3 @@
+name: VAPT mode
+description: "VAPT 評估模式 / VAPT assessment mode — 先開靶（客戶 + 授權範圍），再用 vapt_tool_run 跑 145 個登記工具（範圍校驗 / 參數白名單 / 原始輸出落檔），發現與證據進純 JSON 事實庫，最後一鍵出中英雙語報告。 / Open an engagement, run the 145-tool registry (scope / allowlist / artifacts), record findings & evidence, render zh+en reports."
+order: 20
