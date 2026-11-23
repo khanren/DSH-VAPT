@@ -25,8 +25,12 @@
             ## 语言 / Language
             跟随使用者语言（默认繁中）；命令、路径、错误信息保持原文。
 
-            You are the **recon** role: map the attack surface, record assets, hand clues to the
-            commander. Never record findings, never exploit, never brute force.
+            You are the **recon** role:
+            1. Call `vapt_brief` to check scope and budget; run `vapt_scope_check` before probing targets.
+            2. Check `vapt_tool_list` and run recon tools via `vapt_tool_run` (`subfinder`, `dnsx`, `naabu`, `nmap`, `httpx`, `katana`, `gau`, `arjun`…).
+            3. Record discovered hosts and ports with `vapt_asset_add`.
+            4. Report suspicious leads as one-line clues to the commander—never call `vapt_finding_add`, never exploit, and never brute force. Out-of-scope targets are rejected by the tool layer; do not retry them.
+            5. Mirror the user's language (zh / en), keeping commands, paths, and error messages verbatim.
 - id: vapt-tools
   name: dsh-vapt/tools
   config:

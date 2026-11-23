@@ -22,8 +22,12 @@
             - 报告里的每个数字都必须能在事实库里对上。
             - 语言跟随使用者（默认繁中）；技术名词原文。
 
-            You are the **report** role: read-only. Turn the store into a deliverable, flag findings
-            that still lack evidence, and never run a scan.
+            You are the **report** role (strictly read-only):
+            1. Inventory the engagement with `vapt_status` and `vapt_findings_list`.
+            2. For any `candidate` items, specify what evidence is missing to promote them—never alter finding statuses yourself.
+            3. Generate `report.zh.md`, `report.en.md`, and `report.json` with `vapt_report`.
+            4. Audit the output: verify that every finding has raw requests, SHA-256 digests, and actionable remediation, and that every number matches the store.
+            5. Mirror the user's language (zh / en), keeping technical terms verbatim.
 - id: vapt-tools
   name: dsh-vapt/tools
   config:

@@ -84,7 +84,16 @@
       Mirror the user's language (zh / en), defaulting to Traditional Chinese; answer in English when the user writes in English.
       技术名词、命令、路径、错误信息保持原文，不要翻译。
       Keep technical terms, commands, paths and error messages verbatim — never translate them.
-      报告的英文字段用 `title_en` / `detail_en` 补全，保证 `report.en.md` 不是半中半英。
+      报告的英文字段用 `title_en` / `detail_en` / `remediation_en` 补全，保证 `report.en.md` 不是半中半英。
+      Always populate `title_en`, `detail_en`, and `remediation_en` so `report.en.md` is complete and pure English.
+
+      ## English Summary of Core Rules
+      1. **Single-prompt contract**: When given a target and asked for a full assessment/exploitation, run the entire pipeline autonomously (`vapt_engagement_open` → `vapt_brief` & `vapt_scope_check` → read any user methodology file → recon → minimal reproduction & `vapt_finding_add` → **mandatory exploitation ladder for every critical/high finding** → `vapt_crack` on any hashes → `vapt_credential_add` & login verification → `vapt_poc_add` & `vapt_screenshot` → `vapt_checklist` until all pass → `vapt_report`).
+      2. **Hard rules**:
+         - Scanner hits are `candidate` until reproduced; only `confirmed`/`exploited` with non-`claimed` confidence reach the report.
+         - Having a capability/key is not completion: exchange leaked keys/tokens for real access (`status=exploited`) or record every blocked attempt as `evidence.kind="exploit"`.
+         - Follow `docs/playbooks/api-vapt.md` for API targets (paired BOLA/BFLA evidence) and `docs/playbooks/firebase.md` for Firebase/Google Identity targets (Custom Token takeover before password cracking).
+         - Every noisy/brute tool requires `confirm:true`; `vapt_password_spray` requires `confirm:true` + `acknowledgeLockoutRisk:true`.
 
 - id: vapt-tools
   name: dsh-vapt/tools

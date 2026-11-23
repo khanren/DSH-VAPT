@@ -1,12 +1,13 @@
 # Contributing / 貢獻指南
 
+Run the functional and privacy checks from the project root. With a local DSH CLI installed, run `npm run check:install` to pack the current source into a temporary profile and verify that only `VAPT mode` is registered by default.
+
 在專案根目錄執行功能及隱私測試。若有本機 DSH CLI，可用 `npm run check:install` 將目前的程式碼裝進臨時 profile，確認插件預設只註冊一個 VAPT 模式。
 
-## Dev loop
+## Dev loop / 開發流程
 
-改 `presets/vapt/*.yml` 之后必须重生成登记定义（模式下拉读的是它）：
-After changing `presets/vapt/*.yml`, regenerate the registry definition (the mode
-dropdown reads it):
+After changing `presets/*/*.yml`, regenerate the registry definitions (the mode dropdown reads `definition.json`):
+改 `presets/*/*.yml` 之后必须重生成登记定义（模式下拉读的是它）：
 
 ```bash
 python3 scripts/gen-preset-definition.py

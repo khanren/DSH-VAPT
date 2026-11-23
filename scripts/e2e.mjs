@@ -73,11 +73,16 @@ ok('报告：zh/en 双份，发现 + 原始请求都在');
 
 /* 5) 事件与产物 */
 const runs = store.listEvents(eng.id, 'tool_run');
-const artifacts = readdirSync(join(store.dirOf(eng.id), 'artifacts'));
-if (runs.length < 1) throw new Error('没有 tool_run 事件');
-if (artifacts.length < 1) throw new Error('没有 artifact');
-for (const r of runs) if (!r.sha256 || r.sha256.length !== 64) throw new Error('事件缺 sha256');
-ok(`审计：${runs.length} 条 tool_run 事件，${artifacts.length} 个 artifact`);
+const artifactsDir = join(store.dirOf(eng.id), 'artifacts');
+const artifacts = readdirSync(artifactsDir, { withFileTypes: true }).map((d) => d.name);
+if (tools.nmap?.path || tools.httpx?.path) {
+  if (runs.length < 1) throw new Error('没有 tool_run 事件');
+  if (artifacts.length < 1) throw new Error('没有 artifact');
+  for (const r of runs) if (!r.sha256 || r.sha256.length !== 64) throw new Error('事件缺 sha256');
+  ok(`审计：${runs.length} 条 tool_run 事件，${artifacts.length} 个 artifact`);
+} else {
+  skip('审计：本机未安装 nmap/httpx，跳过 tool_run 与 artifact 断言');
+}
 
 fixture.close();
 console.log(`\n${done.length} passed · ${skipped.length} skipped`);

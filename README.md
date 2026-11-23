@@ -6,13 +6,13 @@
 
 ## Sample report
 
-The sample Chinese report is generated from a fictional "Paper Boat Archive" asset inventory. Below is an excerpt of a finding from evidence to remediation:
+The sample report is generated from a fictional "Paper Boat Archive" asset inventory. Below is an excerpt of a finding from evidence to remediation:
 
 | Finding | Evidence excerpt | Remediation |
 |---|---|---|
 | Asset inventory is missing a maintenance owner (Low) | `{"asset":"archive.example.invalid","owner":null}` | Record the responsible team and contact channel, and have on-call staff verify that the team can be reached. |
 
-The fictional archive’s inventory has no owner for its catalogue service. The Chinese Markdown export links the finding to its evidence and includes a concrete fix. [Read the sample report (Chinese)](docs/example-report.zh.md)
+The fictional archive’s inventory has no owner for its catalogue service. The Markdown export links the finding to its evidence and includes a concrete fix. [Read the sample report (English)](docs/example-report.en.md) · [查看中文报告示例](docs/example-report.zh.md)
 
 ## Install from source
 

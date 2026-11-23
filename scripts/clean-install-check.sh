@@ -96,8 +96,8 @@ console.log('Default VAPT preset: vapt');
 
 const specs = join(process.env.DSH_HOME, 'profiles', profile, 'node_modules/dsh-vapt/src/pentest/specs.js');
 const { buildSpecs } = await import(pathToFileURL(specs));
-assert.equal(buildSpecs({ lang: 'zh' }).length, 17);
-console.log('17 tool definitions present');
+assert.equal(buildSpecs({ lang: 'zh' }).length, 19);
+console.log('19 tool definitions present');
 
 const url = new URL(address);
 assert.ok(url.protocol === 'http:' && url.hostname === '127.0.0.1' && url.searchParams.has('token'),

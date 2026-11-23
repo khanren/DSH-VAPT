@@ -12,7 +12,7 @@
 |---|---|---|
 | 资产清单缺少维护负责人（低风险） | `{"asset":"archive.example.invalid","owner":null}` | 填写负责团队和联系渠道，由值班人员验证能否联系到该团队。 |
 
-该虚构档案馆的目录服务在资产清单中没有填写负责人。导出的中文 Markdown 报告将发现与证据关联，并给出了具体的修复方案。[查看完整报告](docs/example-report.zh.md)
+该虚构档案馆的目录服务在资产清单中没有填写负责人。导出的 Markdown 报告将发现与证据关联，并给出了具体的修复方案。[查看中文报告示例](docs/example-report.zh.md) · [Read the sample report (English)](docs/example-report.en.md)
 
 ## 从源码安装
 

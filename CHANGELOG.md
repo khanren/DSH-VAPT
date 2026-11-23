@@ -7,8 +7,9 @@ were never published and are folded into this entry.
 
 ## [1.0.0] - 2026-11-21
 
-> 1.0.0 在 DSH 中提供 17 个工具，在 MCP 中提供 14 个本地记录和报告工具，支持双语报告。
-> 新 profile 默认只注册 VAPT mode，另外三个模式可按需启用。
+> Version 1.0.0 provides 17 core DSH tools (19 total with exploitation/checklist helpers) and 14 local record and report tools over MCP, with bilingual zh/en reports. Fresh profiles register only `VAPT mode` by default, with three optional role presets available on demand.
+>
+> 1.0.0 在 DSH 中提供 17 个核心工具（含利用与自检共 19 个），在 MCP 中提供 14 个本地记录和报告工具，支持双语报告。新 profile 默认只注册 VAPT mode，另外三个模式可按需启用。
 
 ### Added
 

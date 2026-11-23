@@ -69,11 +69,11 @@ function cmdDoctor() {
 
   const dsh = findDsh();
   if (dsh) ok(`DSH CLI: ${dsh}`);
-  else { bad('找不到 DSH CLI（设 DSH_BIN=/path/to/dsh）'); problems += 1; }
+  else { bad('DSH CLI not found (set DSH_BIN=/path/to/dsh) / 找不到 DSH CLI（设 DSH_BIN=/path/to/dsh）'); problems += 1; }
 
   const list = profiles();
   if (list.length) { ok(`profiles: ${list.join(', ')}`); }
-  else { bad(`没有 profile（${PROFILE_DIR} 为空）`); problems += 1; }
+  else { bad(`No profiles found (${PROFILE_DIR} is empty) / 没有 profile（${PROFILE_DIR} 为空）`); problems += 1; }
 
   const withVapt = list.filter((p) => installedVersion(p));
   if (withVapt.length) {
@@ -81,12 +81,12 @@ function cmdDoctor() {
       const v = installedVersion(p);
       const bundles = profilePkg(p)?.dsh?.profile?.bundles || [];
       const registered = Array.isArray(bundles) && bundles.includes('dsh-vapt');
-      ok(`profile "${p}" 已安装 dsh-vapt@${v}`);
-      if (registered) ok(`  bundle 已注册`);
-      else { bad(`  bundle 未注册（缺 dsh.profile.bundles 条目）→ 运行 install`); problems += 1; }
+      ok(`profile "${p}" has dsh-vapt@${v} installed / 已安装 dsh-vapt@${v}`);
+      if (registered) ok(`  bundle registered / bundle 已注册`);
+      else { bad(`  bundle not registered (missing dsh.profile.bundles entry) → run install / bundle 未注册 → 运行 install`); problems += 1; }
     }
   } else {
-    bad('没有任何 profile 安装 dsh-vapt → 运行 npx dsh-vapt install --profile <name>');
+    bad('No profile has dsh-vapt installed → run npx dsh-vapt install --profile <name> / 没有任何 profile 安装 dsh-vapt');
     problems += 1;
   }
 
@@ -98,27 +98,27 @@ function cmdDoctor() {
     const need = decl.expectedPresets ?? ['vapt'];
     const missing = need.filter((x) => !ids.includes(x));
     const broken = decl.presets.filter((p) => p.broken);
-    info(`此 DSH_HOME 最近一次的模式注册记录：${ids.join(', ')}`);
-    if (decl.ok === false) { bad(`模式注册未成功（${decl.phase ?? 'unknown'}）`); problems += 1; }
-    if (missing.length) { bad(`缺少 preset：${missing.join(', ')}`); problems += 1; }
+    info(`Last registered presets in this DSH_HOME / 最近一次模式注册记录: ${ids.join(', ')}`);
+    if (decl.ok === false) { bad(`Preset registration failed (${decl.phase ?? 'unknown'}) / 模式注册未成功（${decl.phase ?? 'unknown'}）`); problems += 1; }
+    if (missing.length) { bad(`Missing preset(s) / 缺少 preset: ${missing.join(', ')}`); problems += 1; }
     if (Array.isArray(decl.expectedPresets) && ids.some((id) => !need.includes(id))) {
-      bad('注册记录中出现了配置以外的 preset'); problems += 1;
+      bad('Unexpected preset(s) found in registration record / 注册记录中出现了配置以外的 preset'); problems += 1;
     }
-    if (broken.length) { bad(`preset 损坏：${broken.map((b) => b.id).join(', ')}`); problems += 1; }
+    if (broken.length) { bad(`Broken preset(s) / preset 损坏: ${broken.map((b) => b.id).join(', ')}`); problems += 1; }
   } else {
-    bad('preset 尚未注册（启动一次带 dsh-vapt 的 profile 即可）');
+    bad('Presets not registered yet (launch a profile with dsh-vapt once) / preset 尚未注册（启动一次带 dsh-vapt 的 profile 即可）');
     problems += 1;
   }
 
   const dataDir = join(process.env.VAPT_HOME || VAPT_HOME, 'engagements');
   if (existsSync(dataDir)) {
     const n = readdirSync(dataDir).length;
-    ok(`事实库目录可读：${dataDir}（${n} 个 engagement）`);
+    ok(`Store directory readable / 事实库目录可读: ${dataDir} (${n} engagement(s))`);
   } else {
-    info(`事实库尚未创建（首次开靶时自动建）：${dataDir}`);
+    info(`Store not created yet (created on first engagement) / 事实库尚未创建: ${dataDir}`);
   }
 
-  console.log(problems ? `\n发现 ${problems} 个问题` : '\n一切正常');
+  console.log(problems ? `\nFound ${problems} issue(s) / 发现 ${problems} 个问题` : '\nAll checks passed / 一切正常');
   process.exitCode = problems ? 1 : 0;
 }
 
@@ -166,13 +166,13 @@ function cmdInstall(argv) {
     return;
   }
   const dsh = findDsh();
-  if (!dsh) { bad('找不到 DSH CLI（设 DSH_BIN）'); process.exitCode = 1; return; }
+  if (!dsh) { bad('DSH CLI not found (set DSH_BIN) / 找不到 DSH CLI（设 DSH_BIN）'); process.exitCode = 1; return; }
 
-  console.log(`安装 ${pkg} → profile "${profile}"\n`);
+  console.log(`Installing / 安装 ${pkg} → profile "${profile}"\n`);
   if (!existsSync(join(PROFILE_DIR, profile))) {
-    console.log(`  profile 不存在，先从 web 模板创建…`);
+    console.log(`  Profile does not exist; creating from web template / profile 不存在，先从 web 模板创建…`);
     execFileSync(dsh, ['--profile', profile, '--from-default-profile', 'web', '--dump-config'], { stdio: 'ignore' });
-    ok(`profile "${profile}" 已创建`);
+    ok(`profile "${profile}" created / 已创建`);
   }
   execFileSync(dsh, ['plugin', '--profile', profile, 'add', pkg], { stdio: 'inherit' });
 
@@ -183,18 +183,18 @@ function cmdInstall(argv) {
   if (!j.dsh.profile.bundles.includes('dsh-vapt')) {
     j.dsh.profile.bundles.push('dsh-vapt');
     writePrivateFile(p, `${JSON.stringify(j, null, 2)}\n`);
-    ok('bundle 已注册');
+    ok('bundle registered / bundle 已注册');
   } else {
-    info('bundle 已存在，跳过');
+    info('bundle already registered, skipping / bundle 已存在，跳过');
   }
 
-  console.log(`\n下一步：\n  dsh --profile ${profile}          # 启动后，模式菜单默认新增 VAPT mode`);
-  console.log(`  npx dsh-vapt doctor               # 复查安装状态`);
+  console.log(`\nNext steps / 下一步：\n  dsh --profile ${profile}          # Launch DSH (adds VAPT mode by default / 启动后模式菜单默认新增 VAPT mode)`);
+  console.log(`  npx dsh-vapt doctor               # Verify installation / 复查安装状态`);
 }
 
 function cmdDemo() {
   const demo = fileURLToPath(new URL('../bench/demo.mjs', import.meta.url));
-  if (!existsSync(demo)) { bad(`找不到 ${demo}（demo 只在源码仓库可用）`); process.exitCode = 1; return; }
+  if (!existsSync(demo)) { bad(`Cannot find ${demo} (demo is only available in a source checkout) / 找不到 ${demo}`); process.exitCode = 1; return; }
   execFileSync(process.execPath, [demo, ...process.argv.slice(3)], { stdio: 'inherit' });
 }
 
@@ -211,10 +211,10 @@ switch (cmd) {
   default:
     console.log(`dsh-vapt — install / doctor / demo
 
-用法：
-  dsh-vapt install [--profile <name>] [--package <tgz|npm-name>]   装进 profile 并注册 bundle
-  dsh-vapt doctor                                                  检查环境与安装状态
-  dsh-vapt demo [--dvwa] [--keep]                                  跑真实靶场基准（需 Docker）
+Usage / 用法:
+  dsh-vapt install [--profile <name>] [--package <tgz|npm-name>]   Install into profile & register bundle / 装进 profile 并注册 bundle
+  dsh-vapt doctor                                                  Check environment & installation status / 检查环境与安装状态
+  dsh-vapt demo [--dvwa] [--keep]                                  Run live target benchmark (requires Docker) / 跑真实靶场基准（需 Docker）
   dsh-vapt --version
 `);
 }

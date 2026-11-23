@@ -22,8 +22,12 @@
             - 不做范围外测试；不做破坏性动作（写入/删除/重启）除非用户明确要求。
             - 发现要有 CWE（能判就判），修复建议写一句具体的。
 
-            You are the **verify** role: turn a lead into a confirmed, replayable finding — or mark
-            it candidate honestly. Evidence first, conclusions second.
+            You are the **verify** role:
+            1. Check `vapt_findings_list` to avoid duplicates and `vapt_scope_check` to confirm scope.
+            2. Reproduce each lead with minimal action (`vapt_tool_run` / `curl`), then record with `vapt_finding_add` (`status=confirmed`, `confidence=observed`, plus `title_en`/`detail_en`/`remediation_en`, CWE, and remediation).
+            3. Attach replayable evidence to every finding (`vapt_poc_add` for raw HTTP requests, `vapt_screenshot` for visual proof, `vapt_crack` for collected password hashes).
+            4. If reproduction fails, mark it `candidate` honestly. Verify one item at a time, stay strictly in scope, and avoid destructive actions unless explicitly requested.
+            5. Mirror the user's language (zh / en), keeping commands, paths, and error messages verbatim.
 - id: vapt-tools
   name: dsh-vapt/tools
   config:

@@ -9,13 +9,13 @@ conclude*. It is written so that a third party can reproduce the numbers or atta
 
 ---
 
-## 1. Object of measurement
+## 1. Object of measurement / 測量對象
 
-| 被測 | 不被測 |
+| Measured (被測) | Not measured (不被測) |
 |---|---|
-| 工具層：範圍校驗、參數白名單、執行、輸出解析 | 模型推理能力（本基準**不調用任何 LLM**） |
-| 事實庫：發現/證據寫入、去重、信心閘門 | 網絡環境差異（單機、loopback） |
-| 報告層：雙語渲染、攻擊路徑、修復建議、JSON 匯出 | 客戶環境的 WAF / 速率限制 |
+| **Tool layer (工具層)**: scope validation, argument allowlist, execution, output parsing / 範圍校驗、參數白名單、執行、輸出解析 | **Model reasoning (模型推理能力)**: the deterministic benchmark invokes **zero LLMs** / 本基準**不調用任何 LLM** |
+| **Fact store (事實庫)**: finding & evidence persistence, deduplication, confidence gate / 發現與證據寫入、去重、信心閘門 | **Network variance (網絡環境差異)**: single host, loopback only / 單機、loopback |
+| **Reporting layer (報告層)**: bilingual rendering, attack-path graph, remediation, JSON export / 雙語渲染、攻擊路徑、修復建議、JSON 匯出 | **Production edge controls (客戶環境邊界)**: WAF / rate limiting in external environments / 客戶環境的 WAF 與速率限制 |
 
 **Why no LLM**: an LLM-driven run is non-deterministic; two runs of the same agent can differ.
 This benchmark isolates the *plumbing* so the score is reproducible. Agent-level evaluation

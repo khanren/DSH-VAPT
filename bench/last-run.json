@@ -12,7 +12,7 @@
     "remediation": true,
     "cwe": false
   },
-  "elapsed_ms": 63,
+  "elapsed_ms": 110,
   "rows": [
     "PASS  admin without auth",
     "PASS  idor on /api/user",
